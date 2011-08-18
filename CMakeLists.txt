@@ -78,6 +78,7 @@ set(INSTALL_LIBS_TO "/usr/lib" CACHE STRING "Where to install libs.")
 # includes
 include_directories("src")
 
+include_directories(${BOOST_INCLUDE_DIR})
 include_directories(${OGRE_INCLUDE_DIR})
 
 include_directories(${OIS_INCLUDE_DIR})
@@ -90,6 +91,7 @@ include_directories(${AL_INCLUDE_DIR})
 include_directories(${OGG_INCLUDE_DIR})
 include_directories(${VORBIS_INCLUDE_DIR})
 include_directories(${ALUT_INCLUDE_DIR})
+
 
 # add source
 add_subdirectory(src)
