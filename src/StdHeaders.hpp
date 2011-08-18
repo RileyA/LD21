@@ -12,7 +12,6 @@
 #include <deque>
 #include <list>
 #include <assert.h>
-#include <sys/time.h>
 
 // some random typedefs
 typedef std::string String;
@@ -26,10 +25,12 @@ typedef unsigned char byte;
 // Determine platform
 #if defined( __WIN32__ ) || defined( _WIN32 ) || defined (WIN32)
 	#define LD_PLATFORM PLATFORM_WIN32
+	#include <windows.h>
 #elif defined( __APPLE_CC__)
 	#define LD_PLATFORM PLATFORM_APPLE
 #else
 	#define LD_PLATFORM PLATFORM_LINUX
+	#include <sys/time.h>
 #endif
 
 #endif

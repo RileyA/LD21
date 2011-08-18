@@ -58,9 +58,9 @@ void Game::logMessage(String message)
 
 Bucket* Game::createBucket(String name)
 {
-	if(mBuckets.find(name) != mBuckets.end())
-		return mBuckets[name];
-	mBuckets[name] = new Bucket(name);
+	if(mBuckets.find(name) == mBuckets.end())
+		mBuckets[name] = new Bucket(name);
+	return mBuckets[name];
 }
 
 Bucket* Game::getBucket(String name)
@@ -76,10 +76,10 @@ Real Game::getDeltaTimeSeconds()
 	LARGE_INTEGER now;
 	QueryPerformanceCounter(&now);
 	long long tm = now.QuadPart - mLastTime.QuadPart;
-	long long freq = 0;
+	LARGE_INTEGER freq;
 	QueryPerformanceFrequency(&freq);
 	mLastTime = now;
-	return static_cast<Real>(tm)/freq;
+	return static_cast<Real>(tm)/freq.QuadPart;
 #else
 	struct timeval now;
 	gettimeofday(&now, 0);

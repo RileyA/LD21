@@ -55,4 +55,5 @@ Object* Bucket::popObject(Object* obj)
 			return temp;
 		}
 	}
+	return 0;
 }
