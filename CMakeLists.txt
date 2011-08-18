@@ -20,7 +20,7 @@ set(OIS_LIB ${OIS_LIB_DIR}/${LIB_PREFIX}OIS${LIB_POSTFIX})
 # Ogre
 set(OGRE_INCLUDE_DIR "/usr/include/OGRE" CACHE FILEPATH "Where to look for ogre includes.")
 set(OGRE_LIB_DIR "/usr/lib" CACHE FILEPATH "Where to look for ogre libs.")
-set(OGRE_LIB ${OIS_LIB_DIR}/${LIB_PREFIX}OgreMain${LIB_POSTFIX})
+set(OGRE_LIB ${OGRE_LIB_DIR}/${LIB_PREFIX}OgreMain${LIB_POSTFIX})
 
 # Oyster
 set(OYSTER_INCLUDE_DIR "/home/riley/Desktop/Projects/Oyster/include" CACHE FILEPATH "Where to look for oyster includes.")
