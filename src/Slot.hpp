@@ -38,6 +38,7 @@ public:
 
 	/** Listen to a Signal */
 	void operator += (Signal* signal);
+
 	/** Stop listening to a Signal */
 	void operator -= (Signal* signal);
 

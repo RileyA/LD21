@@ -7,6 +7,13 @@ set(SOURCE_FILES
 	Signal.cpp
 	Slot.cpp
 	State.cpp
+	Input/InputMgr.cpp
+	Input/OISListener.cpp
+	Audio/ActiveSound.cpp
+	Audio/AudioMgr.cpp
+	Audio/BufferedSound.cpp
+	Audio/OggStream.cpp
+	Audio/SoundPtr.cpp
 	)
 
 set(HEADER_FILES
@@ -22,8 +29,20 @@ set(HEADER_FILES
 	Slot.hpp
 	State.hpp
 	StdHeaders.hpp
+	Input/InputMgr.cpp
+	Input/OISListener.cpp
+	Audio/ActiveSound.hpp
+	Audio/AudioMgr.hpp
+	Audio/BufferedSound.hpp
+	Audio/OggStream.hpp
+	Audio/SoundPtr.hpp
 	)
 
 add_executable(LD21 ${SOURCE_FILES} ${HEADER_FILES} )
 set_target_properties(LD21 PROPERTIES LINKER_LANGUAGE CXX)
-#target_link_libraries (demo ${ORYX_LIB} ${BOOST_LIB} ${SUBSYSTEMS})
+target_link_libraries (LD21 
+	${OIS_LIB} 
+	${AL_LIB} ${ALUT_LIB} ${OGG_LIB} ${VORBIS_LIB} ${VORBISFILE_LIB} ${VORBISENC_LIB}
+	${OGRE_LIB}
+	${BULLET_C_LIB} ${BULLET_D_LIB} ${BULLET_MATH_LIB}
+	)

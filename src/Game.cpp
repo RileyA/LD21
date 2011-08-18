@@ -16,7 +16,7 @@ Game::Game()
 
 Game::~Game()
 {
-	//...
+	// nothin' to see here, move along folks...
 }
 
 void Game::go()
@@ -72,6 +72,7 @@ Bucket* Game::getBucket(String name)
 
 Real Game::getDeltaTimeSeconds()
 {
+	// hackish, but both seem to provide reasonable precision
 #if LD_PLATFORM == PLATFORM_WIN32
 	LARGE_INTEGER now;
 	QueryPerformanceCounter(&now);
