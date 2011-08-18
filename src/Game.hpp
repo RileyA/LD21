@@ -25,6 +25,8 @@ public:
 	Bucket* createBucket(String name);
 	Bucket* getBucket(String name);
 
+	Real getDeltaTimeSeconds();
+
 	static Game& getRef(){return *msInstance;}
 	static Game* getPtr(){return msInstance;}
 
@@ -35,6 +37,12 @@ private:
 
 	void startState();
 	void endState();
+
+#if LD_PLATFORM == PLATFORM_WIN32
+	LARGE_INTEGER mLastTime;
+#else
+	struct timeval mLastTime;
+#endif
 
 	std::deque<State*> mStates;
 

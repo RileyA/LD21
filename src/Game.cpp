@@ -6,6 +6,12 @@ Game::Game()
 {
 	assert(!msInstance);
 	msInstance = this;
+
+#if LD_PLATFORM == PLATFORM_WIN32
+	QueryPerformanceCounter(&mLastTime);
+#else
+	gettimeofday(&mLastTime, 0);
+#endif
 }
 
 Game::~Game()
@@ -24,9 +30,12 @@ void Game::go()
 
 		while(!currentState->isDone())
 		{
-			currentState->update(0.1f);
+			// figure out delta time
+			Real delta = getDeltaTimeSeconds();
+
+			currentState->update(delta);
 			for(std::map<String, Bucket*>::iterator it = mBuckets.begin(); it != mBuckets.end(); ++it)
-				it->second->update(0.1f);
+				it->second->update(delta);
 		}
 
 		endState();
@@ -59,6 +68,26 @@ Bucket* Game::getBucket(String name)
 	if(mBuckets.find(name) != mBuckets.end())
 		return mBuckets[name];
 	return 0;
+}
+
+Real Game::getDeltaTimeSeconds()
+{
+#if LD_PLATFORM == PLATFORM_WIN32
+	LARGE_INTEGER now;
+	QueryPerformanceCounter(&now);
+	long long tm = now.QuadPart - mLastTime.QuadPart;
+	long long freq = 0;
+	QueryPerformanceFrequency(&freq);
+	mLastTime = now;
+	return static_cast<Real>(tm)/freq;
+#else
+	struct timeval now;
+	gettimeofday(&now, 0);
+	long seconds  = now.tv_sec  - mLastTime.tv_sec;
+	long useconds = now.tv_usec - mLastTime.tv_usec;
+	mLastTime = now;
+	return (seconds*1000.f+useconds/1000.f)/1000.f;
+#endif
 }
 
 void Game::init()

@@ -23,9 +23,6 @@ public:
 protected:
 
 	bool mDone;
-
-private:
-
 	Game* mGame;
 
 };

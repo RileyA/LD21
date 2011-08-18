@@ -2,8 +2,9 @@
 #define Object_H
 
 #include "StdHeaders.hpp"
+#include "EventHandler.hpp"
 
-class Object
+class Object : public EventHandler
 {
 public:
 
