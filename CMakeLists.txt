@@ -58,7 +58,18 @@ endif (UNIX)
 # Bullet
 set(BT_INCLUDE_DIR "/usr/include/bullet" CACHE FILEPATH "Where to look for bullet includes.")
 set(BT_LIB_DIR "/usr/lib" CACHE FILEPATH "Where to look for bullet libs.")
-set(BOOST_THREAD_LIB ${BOOST_LIB_DIR}/${LIB_PREFIX}boost_thread${LIB_POSTFIX})
+
+# Boost
+set(BOOST_INCLUDE_DIR "/usr/include" CACHE FILEPATH "Where to look for boost includes.")
+set(BOOST_LIB_DIR "/usr/lib" CACHE FILEPATH "Where to look for boost libs.")
+
+if (UNIX)
+	set(BOOST_THREAD_LIB ${BOOST_LIB_DIR}/${LIB_PREFIX}boost_thread${LIB_POSTFIX})
+	set(BOOST_DATE_LIB ${BOOST_LIB_DIR}/${LIB_PREFIX}boost_date_time${LIB_POSTFIX})
+else (UNIX)
+	set(BOOST_THREAD_LIB ${BOOST_LIB_DIR}/libboost_thread-vc100-mt-1_44${LIB_POSTFIX})
+	set(BOOST_DATE_LIB ${BOOST_LIB_DIR}/libboost_date_time-vc100-mt-1_44${LIB_POSTFIX})
+endif (UNIX)
 
 # Some options:
 set(INSTALL_RUNTIMES_TO "/usr/bin" CACHE STRING "Where install executables.")
