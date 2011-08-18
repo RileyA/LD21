@@ -31,7 +31,7 @@ void InputMgr::init()
 
 		assignConversions();
 
-		std::map<uint,String>::iterator it = mKeys.begin();
+		std::map<unsigned int,String>::iterator it = mKeys.begin();
 		for(it;it!=mKeys.end();++it)
 		{
 			mKeyNames[it->second] = it->first;
@@ -96,7 +96,7 @@ String InputMgr::getName()
 }
 //-----------------------------------------------------------------------
 
-bool InputMgr::isKeyDown(uint key)
+bool InputMgr::isKeyDown(unsigned int key)
 {
 	return mKeyStates[key];
 }
@@ -108,7 +108,7 @@ bool InputMgr::isKeyDown(String key)
 }
 //-----------------------------------------------------------------------
 
-bool InputMgr::wasKeyPressed(uint key)
+bool InputMgr::wasKeyPressed(unsigned int key)
 {
 	bool wasPressed = mKeyPresses[key];
 	mKeyPresses[key] = false;
@@ -122,7 +122,7 @@ bool InputMgr::wasKeyPressed(String key)
 }
 //-----------------------------------------------------------------------
 
-bool InputMgr::isButtonDown(uint button)
+bool InputMgr::isButtonDown(unsigned int button)
 {
 	return mButtonStates[button];
 }
@@ -134,7 +134,7 @@ bool InputMgr::isButtonDown(String button)
 }
 //-----------------------------------------------------------------------
 
-bool InputMgr::wasButtonPressed(uint button)
+bool InputMgr::wasButtonPressed(unsigned int button)
 {
 	bool wasPressed = mButtonPresses[button];
 	mButtonPresses[button] = false;
@@ -181,38 +181,38 @@ void InputMgr::_setMousePos(int x,int y, int relx, int rely)
 }
 //-----------------------------------------------------------------------
 
-void InputMgr::_key(uint key, bool up, uint val)
+void InputMgr::_key(unsigned int key, bool up, unsigned int val)
 {
 	mKeyStates[key] = up;
 
 	if(up)
 	{
 		getSignal("charPressed")->fire(MessageAny<char>(val));
-		getSignal("keyPressed")->fire(MessageAny<uint>(key));
+		getSignal("keyPressed")->fire(MessageAny<unsigned int>(key));
 		getSignal(String("pressed_")+String(mKeys[key]))->fire(0);
 	}
 	else
 	{
 		mKeyPresses[key] = true;
 		getSignal(String("released_")+String(mKeys[key]))->fire(0);
-		getSignal("keyReleased")->fire(MessageAny<uint>(key));
+		getSignal("keyReleased")->fire(MessageAny<unsigned int>(key));
 		getSignal("charReleased")->fire(MessageAny<char>(val));
 	}
 }
 //-----------------------------------------------------------------------	
 
-void InputMgr::_mouseButton(uint button, bool up)
+void InputMgr::_mouseButton(unsigned int button, bool up)
 {
 	mButtonStates[button] = up;
 	if(!up)
 	{
 		getSignal(String("released_")+String(mButtons[button]))->fire(0);
-		getSignal("mouseReleased")->fire(MessageAny<uint>(button));
+		getSignal("mouseReleased")->fire(MessageAny<unsigned int>(button));
 	}
 	else
 	{
 		mButtonPresses[button] = true;
-		getSignal("mousePressed")->fire(MessageAny<uint>(button));
+		getSignal("mousePressed")->fire(MessageAny<unsigned int>(button));
 		getSignal(String("pressed_")+String(mButtons[button]))->fire(0);
 	}
 }
