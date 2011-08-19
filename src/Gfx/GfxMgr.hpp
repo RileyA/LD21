@@ -7,6 +7,8 @@
 #include "Oyster.h"
 #include "Gui.hpp"
 
+class GfxObject;
+
 class GfxMgr : public Subsystem
 {
 public:
@@ -42,6 +44,13 @@ public:
 
 	Oyster::Oyster* getOyster(){return mOyster;}
 
+	void addGfxObject(GfxObject* obj)
+	{
+		mObjs.push_back(obj);
+	}
+
+	void removeGfxObject(GfxObject* obj);
+
 private:
 
     Ogre::Root* mRoot;
@@ -51,6 +60,7 @@ private:
 	Oyster::Oyster* mOyster;
 
 	std::vector<Gui*> mGuis;
+	std::vector<GfxObject*> mObjs;
 
 	unsigned int mWidth;
 	unsigned int mHeight;

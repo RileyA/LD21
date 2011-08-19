@@ -1,6 +1,7 @@
 #include "StdHeaders.hpp"
 #include "GfxMgr.hpp"
 #include "Game.hpp"
+#include "GfxObject.hpp"
 
 GfxMgr::GfxMgr()
     :mRoot(0),
@@ -115,6 +116,8 @@ void GfxMgr::deinit()
 		endState();
 		for(int i = 0; i < mGuis.size(); ++i)
 			delete mGuis[i];
+		for(int i = 0; i < mObjs.size(); ++i)
+			delete mObjs[i];
 		delete mOyster;
         delete mRoot;
         mRoot = 0;
@@ -149,4 +152,18 @@ Gui* GfxMgr::createGui(Oyster::Batch* b)
 {
 	mGuis.push_back(new Gui(b, "GUI"));
 	return mGuis.back();
+}
+
+void GfxMgr::removeGfxObject(GfxObject* obj) 
+{
+	for(int i = 0; i < mObjs.size(); ++i)
+	{
+		if(mObjs[i] == obj)
+		{
+			GfxObject* ob = mObjs[i];
+			mObjs.erase(mObjs.begin() + i);
+			delete ob;
+			break;
+		}
+	}
 }

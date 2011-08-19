@@ -16,6 +16,7 @@ set(SOURCE_FILES
 	Audio/SoundPtr.cpp
 	Gfx/GfxMgr.cpp
 	Gfx/Gui.cpp
+	Gfx/GfxObject.cpp
 	)
 
 set(HEADER_FILES
@@ -40,6 +41,8 @@ set(HEADER_FILES
 	Audio/SoundPtr.hpp
 	Gfx/GfxMgr.hpp
 	Gfx/Gui.hpp
+	Gfx/GfxObject.hpp
+	Gfx/MeshData.hpp
 	)
 
 add_executable(LD21 ${SOURCE_FILES} ${HEADER_FILES} )

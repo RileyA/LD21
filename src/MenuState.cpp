@@ -2,6 +2,7 @@
 #include "MenuState.hpp"
 #include "Oyster.h"
 #include "Gfx/GfxMgr.hpp"
+#include "Gfx/GfxObject.hpp"
 #include "Audio/AudioMgr.hpp"
 
 MenuState::MenuState()
@@ -31,6 +32,10 @@ void MenuState::init()
 	b->createLayer(1)->createRectangle(0, 0, 50, 50)->setSprite("logo");
 	b->getLayer(1)->createText("hello, world!", 100, 100, 500, 500);
 	mGfx->createGui(b);
+
+	GfxObject* g = new GfxObject("Cube.mesh");
+	g->getNode()->setPosition(0,0,-50);
+
 }
 
 void MenuState::deinit()

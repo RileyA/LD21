@@ -19,6 +19,17 @@ typedef float Real;
 typedef unsigned char byte;
 typedef unsigned int uint;
 
+class StringUtils
+{
+public:
+	template <class T> static String toString(T v)
+	{
+		std::stringstream ss;
+		ss<<v;
+		return ss.str();
+	}
+};
+
 #define PLATFORM_WIN32 1
 #define PLATFORM_LINUX 2
 #define PLATFORM_APPLE 3
