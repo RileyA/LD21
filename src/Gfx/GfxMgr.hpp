@@ -4,6 +4,8 @@
 #include "StdHeaders.hpp"
 #include "Subsystem.hpp"
 #include "Ogre.h"
+#include "Oyster.h"
+#include "Gui.hpp"
 
 class GfxMgr : public Subsystem
 {
@@ -36,12 +38,22 @@ public:
 	bool cameraMotion;
     Ogre::Camera* mCamera;
 
+	Gui* createGui(Oyster::Batch* b); 
+
+	Oyster::Oyster* getOyster(){return mOyster;}
+
 private:
 
     Ogre::Root* mRoot;
     Ogre::SceneManager* mSmgr;
     Ogre::RenderWindow* mWindow;
     Ogre::Viewport* mViewport;
+	Oyster::Oyster* mOyster;
+
+	std::vector<Gui*> mGuis;
+
+	unsigned int mWidth;
+	unsigned int mHeight;
 
     bool mInitialized;
 };

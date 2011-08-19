@@ -4,6 +4,8 @@
 #include "StdHeaders.hpp"
 #include "Bucket.hpp"
 #include "State.hpp"
+#include "Gfx/GfxMgr.hpp"
+#include "Audio/AudioMgr.hpp"
 
 /** Root of the whole thang, singleton (though it must be explicitly constructed) */
 class Game
@@ -30,6 +32,9 @@ public:
 	static Game& getRef(){return *msInstance;}
 	static Game* getPtr(){return msInstance;}
 
+	GfxMgr* getGfx(){return mGfx;}
+	AudioMgr* getAudio(){return mAudio;}
+
 private:
 
 	void init();
@@ -47,6 +52,9 @@ private:
 	std::deque<State*> mStates;
 
 	std::map<String,Bucket*> mBuckets;
+
+	GfxMgr* mGfx;
+	AudioMgr* mAudio;
 
 	// singleton stuffs (yuck)
 	Game(const Game &);

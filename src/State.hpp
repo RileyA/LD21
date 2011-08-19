@@ -4,6 +4,13 @@
 #include "StdHeaders.hpp" 
 
 class Game;
+class GfxMgr;
+class AudioMgr;
+
+namespace Oyster
+{
+	class Oyster;
+}
 
 /** Abstract game state */
 class State
@@ -24,6 +31,9 @@ protected:
 
 	bool mDone;
 	Game* mGame;
+	GfxMgr* mGfx;
+	AudioMgr* mAudio;
+	Oyster::Oyster* mOyster;
 
 };
 

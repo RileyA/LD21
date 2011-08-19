@@ -15,6 +15,7 @@ set(SOURCE_FILES
 	Audio/OggStream.cpp
 	Audio/SoundPtr.cpp
 	Gfx/GfxMgr.cpp
+	Gfx/Gui.cpp
 	)
 
 set(HEADER_FILES
@@ -38,6 +39,7 @@ set(HEADER_FILES
 	Audio/OggStream.hpp
 	Audio/SoundPtr.hpp
 	Gfx/GfxMgr.hpp
+	Gfx/Gui.hpp
 	)
 
 add_executable(LD21 ${SOURCE_FILES} ${HEADER_FILES} )

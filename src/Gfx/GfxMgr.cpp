@@ -21,7 +21,10 @@ GfxMgr::~GfxMgr()
 void GfxMgr::init()
 {
 	// you didn't see anything...
-	init(800, 600, false, false);
+	mWidth = 800;
+	mHeight = 600;
+	init(mWidth, mHeight, false, false);
+	mOyster = new Oyster::Oyster(mWidth,mHeight);
 }
 //---------------------------------------------------------------------------
 
@@ -53,7 +56,7 @@ void GfxMgr::init(uint resX,uint resY,bool vsync,bool fullscreen)
 		miscP["monitorIndex"] = "0";
 
 		mWindow = mRoot->createRenderWindow(
-                "... - Ludum Dare 21 Entry - Copyright Riley Adams 2010",
+                "... - Ludum Dare 21 Entry - Copyright Riley Adams 2011",
                 resX,resY,fullscreen,&miscP);
 
         mWindow->setActive(true);
@@ -71,8 +74,7 @@ void GfxMgr::init(uint resX,uint resY,bool vsync,bool fullscreen)
 		camRoll = mSmgr->createSceneNode();
 		camYaw = mSmgr->createSceneNode();
 		camPitch = mSmgr->createSceneNode();
-		camPos =
-		mSmgr->createSceneNode();
+		camPos = mSmgr->createSceneNode();
 
 		mSmgr->getRootSceneNode()->addChild(camPos);
 		camPos->addChild(camYaw);
@@ -111,6 +113,9 @@ void GfxMgr::deinit()
     if(mInitialized)
     {
 		endState();
+		for(int i = 0; i < mGuis.size(); ++i)
+			delete mGuis[i];
+		delete mOyster;
         delete mRoot;
         mRoot = 0;
 
@@ -128,10 +133,19 @@ void GfxMgr::renderFrame()
 
 void GfxMgr::update(Real delta)
 {
+	for(int i = 0; i < mGuis.size(); ++i)
+		mGuis[i]->update();
 	renderFrame();
 }
 //---------------------------------------------------------------------------
 
 void GfxMgr::endState()
 {
+	delete mOyster;
+	mOyster = new Oyster::Oyster(mWidth,mHeight);
+}
+
+Gui* GfxMgr::createGui(Oyster::Batch* b)
+{
+	mGuis.push_back(new Gui(b, "GUI"));
 }

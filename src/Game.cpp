@@ -33,6 +33,9 @@ void Game::go()
 			// figure out delta time
 			Real delta = getDeltaTimeSeconds();
 
+			mAudio->update(delta);
+			mGfx->update(delta);
+
 			currentState->update(delta);
 			for(std::map<String, Bucket*>::iterator it = mBuckets.begin(); it != mBuckets.end(); ++it)
 				it->second->update(delta);
@@ -94,11 +97,19 @@ Real Game::getDeltaTimeSeconds()
 void Game::init()
 {
 	logMessage("Starting up...");
+	mGfx = new GfxMgr();
+	mAudio = new AudioMgr();
+	mGfx->init();
+	mAudio->init();
 }
 
 void Game::deinit()
 {
 	logMessage("Shutting down...");
+	mGfx->deinit();
+	mAudio->deinit();
+	delete mGfx;
+	delete mAudio;
 }
 
 void Game::startState()
@@ -112,6 +123,8 @@ void Game::endState()
 {
 	logMessage("Ending state...");
 	mStates.front()->deinit();
+	mGfx->endState();
+	mAudio->endState();
 	// delete buckets and stuff
 	for(std::map<String,Bucket*>::iterator it = mBuckets.begin(); it != mBuckets.end(); ++it)
 	{
