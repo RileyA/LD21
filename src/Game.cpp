@@ -35,6 +35,7 @@ void Game::go()
 
 			mAudio->update(delta);
 			mGfx->update(delta);
+			mInput->update(delta);
 
 			currentState->update(delta);
 			for(std::map<String, Bucket*>::iterator it = mBuckets.begin(); it != mBuckets.end(); ++it)
@@ -99,8 +100,10 @@ void Game::init()
 	logMessage("Starting up...");
 	mGfx = new GfxMgr();
 	mAudio = new AudioMgr();
+	mInput = new InputMgr();
 	mGfx->init();
 	mAudio->init();
+	mInput->init();
 }
 
 void Game::deinit()
@@ -108,8 +111,10 @@ void Game::deinit()
 	logMessage("Shutting down...");
 	mGfx->deinit();
 	mAudio->deinit();
+	mInput->deinit();
 	delete mGfx;
 	delete mAudio;
+	delete mInput;
 }
 
 void Game::startState()
@@ -125,6 +130,7 @@ void Game::endState()
 	mStates.front()->deinit();
 	mGfx->endState();
 	mAudio->endState();
+	mInput->endState();
 	// delete buckets and stuff
 	for(std::map<String,Bucket*>::iterator it = mBuckets.begin(); it != mBuckets.end(); ++it)
 	{

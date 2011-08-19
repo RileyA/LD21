@@ -6,6 +6,7 @@
 #include "State.hpp"
 #include "Gfx/GfxMgr.hpp"
 #include "Audio/AudioMgr.hpp"
+#include "Input/InputMgr.hpp"
 
 /** Root of the whole thang, singleton (though it must be explicitly constructed) */
 class Game
@@ -34,6 +35,7 @@ public:
 
 	GfxMgr* getGfx(){return mGfx;}
 	AudioMgr* getAudio(){return mAudio;}
+	InputMgr* getInput(){return mInput;}
 
 private:
 
@@ -55,6 +57,7 @@ private:
 
 	GfxMgr* mGfx;
 	AudioMgr* mAudio;
+	InputMgr* mInput;
 
 	// singleton stuffs (yuck)
 	Game(const Game &);

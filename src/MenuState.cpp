@@ -20,6 +20,11 @@ void MenuState::init()
 	mGfx = Game::getPtr()->getGfx();
 	mAudio = Game::getPtr()->getAudio();
 	mOyster = mGfx->getOyster();
+
+	size_t handle = 0;
+	mGfx->getWindow()->getCustomAttribute("WINDOW", &handle);
+
+	mGame->getInput()->initInput(handle,true);
 	//...
 	mOyster->createAtlas("Test", "TechDemo.oyster");
 	Oyster::Batch* b = mOyster->createBatch("Test", "Test");
