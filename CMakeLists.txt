@@ -94,6 +94,9 @@ include_directories(${OGG_INCLUDE_DIR})
 include_directories(${VORBIS_INCLUDE_DIR})
 include_directories(${ALUT_INCLUDE_DIR})
 
+# enable testing
+ENABLE_TESTING()
+INCLUDE(CTest)
 
 # add source
 add_subdirectory(src)
