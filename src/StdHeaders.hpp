@@ -17,6 +17,7 @@
 typedef std::string String;
 typedef float Real;
 typedef unsigned char byte;
+typedef unsigned int uint;
 
 #define PLATFORM_WIN32 1
 #define PLATFORM_LINUX 2

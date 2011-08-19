@@ -1,6 +1,7 @@
 #include "Game.hpp"
 #include "MenuState.hpp"
 #include "Audio/AudioMgr.hpp"
+#include "Gfx/GfxMgr.hpp"
 
 int main(int argc, char** argv)
 {
@@ -8,8 +9,10 @@ int main(int argc, char** argv)
 	MenuState* m = new MenuState();
 
 	AudioMgr am;
+	GfxMgr gm;
 
 	am.init();
+	gm.init();
 
 	am.play2D("boom.wav");
 
@@ -20,6 +23,7 @@ int main(int argc, char** argv)
 		Real d = g->getDeltaTimeSeconds();
 		tim += d;
 		am.update(d);
+		gm.update(d);
 	}
 
 	am.play2D("boom.wav");
@@ -31,8 +35,10 @@ int main(int argc, char** argv)
 		Real d = g->getDeltaTimeSeconds();
 		tim += d;
 		am.update(d);
+		gm.update(d);
 	}
 
+	gm.deinit();
 	am.deinit();
 
 	g->addState(m);
