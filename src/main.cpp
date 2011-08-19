@@ -15,6 +15,17 @@ int main(int argc, char** argv)
 
 	Real tim = 0.f;
 
+	while(tim < 2.f)
+	{
+		Real d = g->getDeltaTimeSeconds();
+		tim += d;
+		am.update(d);
+	}
+
+	am.play2D("boom.wav");
+
+	tim = 0.f;
+
 	while(tim < 5.f)
 	{
 		Real d = g->getDeltaTimeSeconds();
