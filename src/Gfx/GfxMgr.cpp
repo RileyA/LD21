@@ -148,4 +148,5 @@ void GfxMgr::endState()
 Gui* GfxMgr::createGui(Oyster::Batch* b)
 {
 	mGuis.push_back(new Gui(b, "GUI"));
+	return mGuis.back();
 }
