@@ -121,7 +121,7 @@ GfxObject::GfxObject(const MeshData& data, String material)
 	//int dims = 16;
 	//m->_setBounds(AxisAlignedBox(-dims/2,-64/2,-dims/2,dims/2,64/2,dims/2));
 	m->_setBounds(AxisAlignedBox(-60.f,-60.f,-60.f,60.f,60.f,60.f));
-	m->_setBoundingSphereRadius(sqrt(60*60*2)/2);//11.313f);
+	m->_setBoundingSphereRadius(60.f);//11.313f);
 
 	sm->setMaterialName(material);
 
