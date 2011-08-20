@@ -78,4 +78,6 @@ void MenuState::update(Real delta)
 	//if(mTimeElapsed > 5.f)
 	if(mGame->getPtr()->getInput()->wasKeyPressed("KC_ESCAPE"))
 		setDone(true);
+	if(mGame->getPtr()->getInput()->wasKeyPressed("KC_P"))
+		ob->setPosition(Vector3(0,0,0));
 }
