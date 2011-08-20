@@ -17,6 +17,8 @@ set(SOURCE_FILES
 	Gfx/GfxMgr.cpp
 	Gfx/Gui.cpp
 	Gfx/GfxObject.cpp
+	Physics/PhysicsMgr.cpp
+	PhysicsObject.cpp
 	)
 
 set(HEADER_FILES
@@ -43,6 +45,8 @@ set(HEADER_FILES
 	Gfx/Gui.hpp
 	Gfx/GfxObject.hpp
 	Gfx/MeshData.hpp
+	Physics/PhysicsMgr.hpp
+	PhysicsObject.hpp
 	)
 
 add_executable(LD21 ${SOURCE_FILES} ${HEADER_FILES} )
@@ -52,5 +56,5 @@ target_link_libraries (LD21
 	${AL_LIB} ${ALUT_LIB} ${OGG_LIB} ${VORBIS_LIB} ${VORBISFILE_LIB} ${VORBISENC_LIB}
 	${OGRE_LIB}
 	${BOOST_DATE_LIB} ${BOOST_THREAD_LIB}
-	${BULLET_C_LIB} ${BULLET_D_LIB} ${BULLET_MATH_LIB}
+	${BT_C_LIB} ${BT_D_LIB} ${BT_MATH_LIB}
 	)

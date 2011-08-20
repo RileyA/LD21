@@ -4,7 +4,6 @@
 #include "StdHeaders.hpp"
 #include "Ogre.h"
 #include "MeshData.hpp"
-#include "Game.hpp"
 
 class GfxObject
 {

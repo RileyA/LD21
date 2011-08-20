@@ -1,4 +1,5 @@
 #include "GfxObject.hpp"
+#include "Game.hpp"
 
 int GfxObject::mAutoNameIndex = 0;
 

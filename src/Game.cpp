@@ -33,9 +33,8 @@ void Game::go()
 			// figure out delta time
 			Real delta = getDeltaTimeSeconds();
 
-			mAudio->update(delta);
-			mGfx->update(delta);
-			mInput->update(delta);
+			for(int i = 0; i < mSubsystems.size(); ++i)
+				mSubsystems[i]->update(delta);
 
 			currentState->update(delta);
 			for(std::map<String, Bucket*>::iterator it = mBuckets.begin(); it != mBuckets.end(); ++it)
@@ -101,20 +100,26 @@ void Game::init()
 	mGfx = new GfxMgr();
 	mAudio = new AudioMgr();
 	mInput = new InputMgr();
-	mGfx->init();
-	mAudio->init();
-	mInput->init();
+	mPhysics = new PhysicsMgr();
+
+	mSubsystems.push_back(mInput);
+	mSubsystems.push_back(mGfx);
+	mSubsystems.push_back(mPhysics); 
+	mSubsystems.push_back(mAudio);
+
+	for(int i = 0; i < mSubsystems.size(); ++i)
+		mSubsystems[i]->init();
 }
 
 void Game::deinit()
 {
 	logMessage("Shutting down...");
-	mGfx->deinit();
-	mAudio->deinit();
-	mInput->deinit();
-	delete mGfx;
-	delete mAudio;
-	delete mInput;
+	for(int i = 0; i < mSubsystems.size(); ++i)
+	{
+		mSubsystems[i]->deinit();
+		delete mSubsystems[i];
+	}
+	mSubsystems.clear();
 }
 
 void Game::startState()
@@ -128,9 +133,6 @@ void Game::endState()
 {
 	logMessage("Ending state...");
 	mStates.front()->deinit();
-	mGfx->endState();
-	mAudio->endState();
-	mInput->endState();
 	// delete buckets and stuff
 	for(std::map<String,Bucket*>::iterator it = mBuckets.begin(); it != mBuckets.end(); ++it)
 	{

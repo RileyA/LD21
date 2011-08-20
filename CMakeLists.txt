@@ -85,7 +85,7 @@ include_directories(${OGRE_INCLUDE_DIR})
 
 include_directories(${OIS_INCLUDE_DIR})
 
-include_directories(${BULLET_INCLUDE_DIR})
+include_directories(${BT_INCLUDE_DIR})
 
 include_directories(${OYSTER_INCLUDE_DIR})
 
