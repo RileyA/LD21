@@ -24,6 +24,7 @@ set(SOURCE_FILES
 	PhysObj.cpp
 	Chunk.cpp
 	MapManager.cpp
+	Player.cpp
 	)
 
 set(HEADER_FILES
@@ -56,6 +57,7 @@ set(HEADER_FILES
 	PhysObj.hpp
 	Chunk.hpp
 	MapManager.hpp
+	Player.hpp
 	)
 
 add_executable(LD21 ${SOURCE_FILES} ${HEADER_FILES} )

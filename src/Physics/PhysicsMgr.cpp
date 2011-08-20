@@ -33,7 +33,7 @@ void PhysicsMgr::init()
 	mDynamicsWorld->setGravity(btVector3(0,-9.8,0));
 	mGlobalGravity = Ogre::Vector3(0,-9.8,0);
 
-	mTimeStep = 1.f/100.f;
+	mTimeStep = 1.f/300.f;
 	mAccumulation = 0.f;
 	mInterpolation = 0.f;
 	started = true;

@@ -52,7 +52,7 @@ void MapManager::gen(int d)
 			if(i == 0 || i == WIDTH-1 || j == 0 || j== HEIGHT-1)
 				mChunks.back()->data[i][j][k] = rand()%15+1;
 			else
-				mChunks.back()->data[i][j][k] = 0;//!(rand()%30);
+				mChunks.back()->data[i][j][k] = !(rand()%100);
 		}
 
 		if(gennedTo > 0)
