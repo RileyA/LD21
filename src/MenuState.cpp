@@ -4,6 +4,7 @@
 #include "Gfx/GfxMgr.hpp"
 #include "Gfx/GfxObject.hpp"
 #include "Audio/AudioMgr.hpp"
+#include "FPSCam.hpp"
 
 MenuState::MenuState()
 	:State()
@@ -36,6 +37,7 @@ void MenuState::init()
 	GfxObject* g = new GfxObject("Cube.mesh");
 	g->getNode()->setPosition(0,0,-50);
 
+	new FPSCam(mGfx->mCamera);
 }
 
 void MenuState::deinit()
@@ -45,9 +47,10 @@ void MenuState::deinit()
 
 void MenuState::update(Real delta)
 {
-	mTimeElapsed += delta;
-	std::cout<<mTimeElapsed<<"\n";
+	//mTimeElapsed += delta;
+	//std::cout<<mTimeElapsed<<"\n";
 
-	if(mTimeElapsed > 5.f)
+	//if(mTimeElapsed > 5.f)
+	if(mGame->getPtr()->getInput()->wasKeyPressed("KC_ESCAPE"))
 		setDone(true);
 }

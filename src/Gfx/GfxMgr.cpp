@@ -72,21 +72,6 @@ void GfxMgr::init(uint resX,uint resY,bool vsync,bool fullscreen)
 
 		mCamera->setPosition(0,0,-1.5f);
 
-		camRoll = mSmgr->createSceneNode();
-		camYaw = mSmgr->createSceneNode();
-		camPitch = mSmgr->createSceneNode();
-		camPos = mSmgr->createSceneNode();
-
-		mSmgr->getRootSceneNode()->addChild(camPos);
-		camPos->addChild(camYaw);
-		camYaw->addChild(camPitch);
-		camPitch->addChild(camRoll);
-		camRoll->attachObject(mCamera);
-		
-		// for external use...
-		pichLimit = 80.f;
-		pitch = 0.f;
-		cameraMotion = false;
 
         mViewport = mWindow->addViewport(mCamera);
 		mViewport->setBackgroundColour(Ogre::ColourValue(44.f/455.f,90.f/455.f,93.f/455.f));

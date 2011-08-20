@@ -7,6 +7,7 @@ set(SOURCE_FILES
 	Signal.cpp
 	Slot.cpp
 	State.cpp
+	Object.cpp
 	Input/InputMgr.cpp
 	Input/OISListener.cpp
 	Audio/ActiveSound.cpp
@@ -19,6 +20,8 @@ set(SOURCE_FILES
 	Gfx/GfxObject.cpp
 	Physics/PhysicsMgr.cpp
 	PhysicsObject.cpp
+	FPSCam.cpp
+	PhysObj.cpp
 	)
 
 set(HEADER_FILES
@@ -47,6 +50,8 @@ set(HEADER_FILES
 	Gfx/MeshData.hpp
 	Physics/PhysicsMgr.hpp
 	PhysicsObject.hpp
+	FPSCam.hpp
+	PhysObj.hpp
 	)
 
 add_executable(LD21 ${SOURCE_FILES} ${HEADER_FILES} )

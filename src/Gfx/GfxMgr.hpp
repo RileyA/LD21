@@ -31,13 +31,6 @@ public:
 
 	void endState();
 
-	Ogre::SceneNode* camRoll;
-	Ogre::SceneNode* camYaw;
-	Ogre::SceneNode* camPitch;
-	Ogre::SceneNode* camPos;
-	Real pichLimit;
-	Real pitch;
-	bool cameraMotion;
     Ogre::Camera* mCamera;
 
 	Gui* createGui(Oyster::Batch* b); 
@@ -51,7 +44,7 @@ public:
 
 	void removeGfxObject(GfxObject* obj);
 
-private:
+//private: screw encapsulation I'm lazy...
 
     Ogre::Root* mRoot;
     Ogre::SceneManager* mSmgr;
