@@ -22,6 +22,8 @@ set(SOURCE_FILES
 	PhysicsObject.cpp
 	FPSCam.cpp
 	PhysObj.cpp
+	Chunk.cpp
+	MapManager.cpp
 	)
 
 set(HEADER_FILES
@@ -52,6 +54,8 @@ set(HEADER_FILES
 	PhysicsObject.hpp
 	FPSCam.hpp
 	PhysObj.hpp
+	Chunk.hpp
+	MapManager.hpp
 	)
 
 add_executable(LD21 ${SOURCE_FILES} ${HEADER_FILES} )

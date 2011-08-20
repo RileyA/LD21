@@ -70,7 +70,7 @@ void GfxMgr::init(uint resX,uint resY,bool vsync,bool fullscreen)
         mCamera->setNearClipDistance(0.01f);
         mCamera->setFOVy(Ogre::Radian(Ogre::Degree(60)));
 
-		mCamera->setPosition(0,0,-1.5f);
+		//mCamera->setPosition(0,0,-1.5f);
 
 
         mViewport = mWindow->addViewport(mCamera);

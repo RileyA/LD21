@@ -6,11 +6,60 @@ int GfxObject::mAutoNameIndex = 0;
 GfxObject::GfxObject(const MeshData& data, String material)
 {
 	mSmgr = Game::getPtr()->getGfx()->getSceneManager();
-
-	
-	String nombre = "SceneNodeAutoNamed"+StringUtils::toString(mAutoNameIndex);
+	nombre = "SceneNodeAutoNamed"+StringUtils::toString(mAutoNameIndex);
 	++mAutoNameIndex;
+	Game::getPtr()->getGfx()->addGfxObject(this);
+	mNode = mSmgr->getRootSceneNode()->createChildSceneNode(nombre);
+	mEntity = 0;
+	load(data);
+	mat = material;
+}
 
+GfxObject::GfxObject(String material, Vector3 pos)
+{
+	mSmgr = Game::getPtr()->getGfx()->getSceneManager();
+	nombre = "SceneNodeAutoNamed"+StringUtils::toString(mAutoNameIndex);
+	++mAutoNameIndex;
+	Game::getPtr()->getGfx()->addGfxObject(this);
+	mNode = mSmgr->getRootSceneNode()->createChildSceneNode(nombre);
+	mNode->setPosition(pos);
+	mEntity = 0;
+	mat = material;
+}
+
+GfxObject::GfxObject(String mesh)
+{
+	mSmgr = Game::getPtr()->getGfx()->getSceneManager();
+	mEntity = mSmgr->createEntity(mesh);
+	mNode = mSmgr->getRootSceneNode()->createChildSceneNode();
+	mNode->attachObject(mEntity);
+	Game::getPtr()->getGfx()->addGfxObject(this);
+}
+
+GfxObject::GfxObject(String mesh, String name)
+{
+	mSmgr = Game::getPtr()->getGfx()->getSceneManager();
+	mEntity = mSmgr->createEntity(name, mesh);
+	mNode = mSmgr->getRootSceneNode()->createChildSceneNode(name);
+	mNode->attachObject(mEntity);
+	Game::getPtr()->getGfx()->addGfxObject(this);
+}
+
+void GfxObject::kill()
+{
+	Game::getPtr()->getGfx()->removeGfxObject(this);
+}
+
+GfxObject::~GfxObject()
+{
+	mNode->detachAllObjects();
+	mSmgr->destroySceneNode(mNode);
+	if(mEntity)
+		mSmgr->destroyEntity(mEntity);
+}
+
+void GfxObject::load(const MeshData& data)
+{
 	using namespace Ogre;
 
 	bool hasVertexColor = data.getDiffuse();
@@ -124,42 +173,20 @@ GfxObject::GfxObject(const MeshData& data, String material)
 	m->_setBounds(AxisAlignedBox(-60.f,-60.f,-60.f,60.f,60.f,60.f));
 	m->_setBoundingSphereRadius(60.f);//11.313f);
 
-	sm->setMaterialName(material);
+	sm->setMaterialName(mat);
 
-	Ogre::Entity* ent = mSmgr->createEntity(nombre,m->getName());
-	Ogre::SceneNode* node = mSmgr->getRootSceneNode()->createChildSceneNode(nombre);
-	node->attachObject(ent);
-	ent->setCastShadows(false);
-	Game::getPtr()->getGfx()->addGfxObject(this);
-}
-
-GfxObject::GfxObject(String mesh)
-{
-	mSmgr = Game::getPtr()->getGfx()->getSceneManager();
-	mEntity = mSmgr->createEntity(mesh);
-	mNode = mSmgr->getRootSceneNode()->createChildSceneNode();
+	mEntity = mSmgr->createEntity(nombre,m->getName());
 	mNode->attachObject(mEntity);
-	Game::getPtr()->getGfx()->addGfxObject(this);
+	mEntity->setCastShadows(false);
 }
 
-GfxObject::GfxObject(String mesh, String name)
+void GfxObject::unload()
 {
-	mSmgr = Game::getPtr()->getGfx()->getSceneManager();
-	mEntity = mSmgr->createEntity(name, mesh);
-	mNode = mSmgr->getRootSceneNode()->createChildSceneNode(name);
-	mNode->attachObject(mEntity);
-	Game::getPtr()->getGfx()->addGfxObject(this);
-}
-
-void GfxObject::kill()
-{
-	Game::getPtr()->getGfx()->removeGfxObject(this);
-}
-
-GfxObject::~GfxObject()
-{
-	mNode->detachAllObjects();
-	mSmgr->destroySceneNode(mNode);
+	Ogre::MeshPtr m = mEntity->getMesh();
+	if(m->isManuallyLoaded())
+	{
+		Ogre::MeshManager::getSingleton().unload(m->getName());
+		Ogre::MeshManager::getSingleton().remove(m->getName());
+	}
 	mSmgr->destroyEntity(mEntity);
-	std::cout<<"deleeeeeted\n";
 }
