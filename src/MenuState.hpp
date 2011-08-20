@@ -3,6 +3,8 @@
 
 #include "State.hpp"
 
+class FPSCam;
+
 class MenuState : public State
 {
 public:
@@ -17,6 +19,8 @@ public:
 protected:
 
 	Real mTimeElapsed;
+	PhysicsObject* ob;
+	FPSCam* fps;
 
 };
 

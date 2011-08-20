@@ -52,26 +52,13 @@ void MapManager::gen(int d)
 			if(i == 0 || i == WIDTH-1 || j == 0 || j== HEIGHT-1)
 				mChunks.back()->data[i][j][k] = rand()%15+1;
 			else
-				mChunks.back()->data[i][j][k] = !(rand()%10);
+				mChunks.back()->data[i][j][k] = !(rand()%30);
 		}
 
-		std::cout<<"genned "<<gennedTo<<"\n";
 		if(gennedTo > 0)
 		{
-			std::cout<<"built "<<gennedTo - 1<<"\n";
 			mChunks.back()->prev->next = mChunks.back();
 			mChunks.back()->prev->build();
-
-			std::cout<<"-----------\n";
-			Chunk* cc = mChunks.front();
-			while(cc)
-			{
-				std::cout<<cc->obj->getNode()->getPosition().z<<"\n";
-				if(cc->prev)
-					std::cout<<"\t"<<cc->prev->obj->getNode()->getPosition().z<<"\n";
-				cc = cc->next;
-			}
-			// build da mesh
 		}
 		++gennedTo;
 	}

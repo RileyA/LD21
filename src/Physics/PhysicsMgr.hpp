@@ -29,6 +29,14 @@ enum CollisionTypes
 	COLLISION_GROUP_15 = BIT(15)
 };
 
+struct Trimesh
+{
+	btCollisionObject* actor;
+	btTriangleMesh* mesh;
+	btBvhTriangleMeshShape* shape;
+	void kill();
+};
+
 struct RaycastReport
 {
 	RaycastReport()
@@ -64,16 +72,19 @@ public:
 	void endState(){};
 
 
-	PhysicsObject* createStaticTrimesh(GfxObject* object,Ogre::Vector3 pos);
-	PhysicsObject* createStaticTrimesh(String mesh,Ogre::Vector3 pos);
+	Trimesh createStaticTrimesh(const MeshData& d, Ogre::Vector3 pos);
+	//PhysicsObject* createStaticTrimesh(GfxObject* object,Ogre::Vector3 pos);
+	//PhysicsObject* createStaticTrimesh(String mesh,Ogre::Vector3 pos);
+	//PhysicsObject* createStaticTrimesh(const MeshData& d,Ogre::Vector3 pos);
 	PhysicsObject* createCube(Ogre::Vector3 scale,Ogre::Vector3 pos);
 	PhysicsObject* createConvexHull(GfxObject* object,Ogre::Vector3 pos);
 	PhysicsObject* createConvexHull(String meshname,Ogre::Vector3 pos,Ogre::Vector3 scale=Ogre::Vector3(1,1,1));
 	PhysicsObject* createSphere(float radius,Ogre::Vector3 pos);
+	PhysicsObject* createCapsule(float radius, float height,Ogre::Vector3 pos);
 
 	bool isEnabled();
 
-	btDynamicsWorld* getScene();
+	btDynamicsWorld* getScene(){return mDynamicsWorld;}
 
 	float getInterpolation();
 

@@ -15,8 +15,6 @@ public:
 	void update(Real delta);
 	void look(const Message& m);
 
-private:
-
 	Ogre::SceneNode* camRoll;
 	Ogre::SceneNode* camYaw;
 	Ogre::SceneNode* camPitch;

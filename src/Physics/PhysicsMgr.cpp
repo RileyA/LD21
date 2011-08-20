@@ -30,8 +30,8 @@ void PhysicsMgr::init()
 
 	mDynamicsWorld = new btDiscreteDynamicsWorld(mDispatcher,mBroadphase,mSolver,mCollisionConfiguration);
 
-	mDynamicsWorld->setGravity(btVector3(0,0,0));
-	mGlobalGravity = Ogre::Vector3(0,0,0);
+	mDynamicsWorld->setGravity(btVector3(0,-9.8,0));
+	mGlobalGravity = Ogre::Vector3(0,-9.8,0);
 
 	mTimeStep = 1.f/100.f;
 	mAccumulation = 0.f;
@@ -123,172 +123,45 @@ float PhysicsMgr::getInterpolation()
 {
 	return mInterpolation;
 }
-
-PhysicsObject* PhysicsMgr::createStaticTrimesh(String meshname,Ogre::Vector3 pos)
+ 
+Trimesh PhysicsMgr::createStaticTrimesh(const MeshData& d, Ogre::Vector3 pos)
 {
-	size_t vertex_count;
-	btVector3* vertices;
-	size_t numTris;
-	size_t index_count;
-	unsigned* indices;
-	float vArray[9];
-	vertex_count = index_count = 0;
-	bool added_shared = false;
-	size_t current_offset = vertex_count;
-	size_t shared_offset = vertex_count;
-	size_t next_offset = vertex_count;
-	size_t index_offset = index_count;
-	size_t prev_vert = vertex_count;
-	size_t prev_ind = index_count;
+	btTriangleMesh *triMesh = new btTriangleMesh();
 
-	bool newShape = false;
-
-	if(mShapes.find(meshname)==mShapes.end())
+	for(int i=0;i<d.vertices.size();i+=9)
 	{
-		newShape = true;
-		btTriangleMesh *mTriMesh = new btTriangleMesh();
-
-		Ogre::MeshPtr mesh = Ogre::MeshManager::getSingletonPtr()->load(meshname,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);//Ogre::MeshPtr(mesh_);
-
-		for(int i = 0;i < mesh->getNumSubMeshes();i++)
-		{
-			Ogre::SubMesh* submesh = mesh->getSubMesh(i);
-
-			if(submesh->useSharedVertices)
-			{
-				if(!added_shared)
-				{
-					Ogre::VertexData* vertex_data = mesh->sharedVertexData;
-					vertex_count += vertex_data->vertexCount;
-					added_shared = true;
-				}
-			}
-			else
-			{
-				Ogre::VertexData* vertex_data = submesh->vertexData;
-				vertex_count += vertex_data->vertexCount;
-			}
-
-			Ogre::IndexData* index_data = submesh->indexData;
-			index_count += index_data->indexCount;
-		}
-
-		int a = vertex_count;
-		vertices = new btVector3[vertex_count];
-		indices = new unsigned[index_count];
-
-		added_shared = false;
-
-		int rVT = 0;
-		int rIT = 0;
-
-		for(int i = 0;i < mesh->getNumSubMeshes();i++)
-		{
-			Ogre::SubMesh* submesh = mesh->getSubMesh(i);
-
-			Ogre::VertexData* vertex_data = submesh->useSharedVertices ? mesh->sharedVertexData : submesh->vertexData;
-			if((!submesh->useSharedVertices)||(submesh->useSharedVertices && !added_shared))
-			{
-				if(submesh->useSharedVertices)
-				{
-					added_shared = true;
-					shared_offset = current_offset;
-				}
-
-				const Ogre::VertexElement* posElem = vertex_data->vertexDeclaration->findElementBySemantic(Ogre::VES_POSITION);
-				Ogre::HardwareVertexBufferSharedPtr vbuf = vertex_data->vertexBufferBinding->getBuffer(posElem->getSource());
-				unsigned char* vertex = static_cast<unsigned char*>(vbuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
-				Ogre::Real* pReal;
-
-				for(size_t j = 0; j < vertex_data->vertexCount; ++j, vertex += vbuf->getVertexSize())
-				{
-					posElem->baseVertexPointerToElement(vertex, &pReal);
-
-					Ogre::Vector3 pt;
-
-					pt.x = (*pReal++);
-					pt.y = (*pReal++);
-					pt.z = (*pReal++);
-
-					//pt = quat*pt;// + loc; //compensate for scale/transform/rotation (uneeded for static stuff)
-					vertices[rVT + current_offset + j].setX(pt.x);
-					vertices[rVT + current_offset + j].setY(pt.y);
-					vertices[rVT + current_offset + j].setZ(pt.z);
-				}
-
-				vbuf->unlock();
-				next_offset += vertex_data->vertexCount;
-			}
-
-			Ogre::IndexData* index_data = submesh->indexData;
-
-			numTris = index_data->indexCount / 3;
-			unsigned short* pShort;
-			unsigned int* pInt;
-			Ogre::HardwareIndexBufferSharedPtr ibuf = index_data->indexBuffer;
-			bool use32bitindexes = (ibuf->getType() == Ogre::HardwareIndexBuffer::IT_32BIT);
-			if (use32bitindexes) pInt = static_cast<unsigned int*>(ibuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
-			else pShort = static_cast<unsigned short*>(ibuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
-
-			for(size_t k = 0; k < numTris; ++k)
-			{
-				size_t offset = (submesh->useSharedVertices)?shared_offset:current_offset;
-
-				unsigned int vindex = use32bitindexes? *pInt++ : *pShort++;
-				indices[rIT + index_offset + 0] = vindex + offset;
-				vArray[0] =  vertices[indices[index_offset + 0]].x();
-				vArray[1] =  vertices[indices[index_offset + 0]].y();
-				vArray[2] =  vertices[indices[index_offset + 0]].z();
-				vindex = use32bitindexes? *pInt++ : *pShort++;
-				indices[rIT + index_offset + 1] = vindex + offset;
-				vArray[3] =  vertices[indices[index_offset + 1]].x();
-				vArray[4] =  vertices[indices[index_offset + 1]].y();
-				vArray[5] =  vertices[indices[index_offset + 1]].z();
-				vindex = use32bitindexes? *pInt++ : *pShort++;
-				indices[rIT + index_offset + 2] = vindex + offset;
-				vArray[6] =  vertices[indices[index_offset + 2]].x();
-				vArray[7] =  vertices[indices[index_offset + 2]].y();
-				vArray[8] =  vertices[indices[index_offset + 2]].z();
-
-				mTriMesh->addTriangle(btVector3(vArray[0],vArray[1],vArray[2]),
-					btVector3(vArray[3],vArray[4],vArray[5]),
-					btVector3(vArray[6],vArray[7],vArray[8]));
-
-				index_offset += 3;
-			}
-			ibuf->unlock();
-			current_offset = next_offset;
-		}
-
-		btCollisionShape *triMeshShape = new btBvhTriangleMeshShape(mTriMesh,true);
-		mShapes[meshname] = triMeshShape;
-
+		triMesh->addTriangle(
+			btVector3(
+				d.vertices[i],
+				d.vertices[i+1],
+				d.vertices[i+2]),
+			btVector3(
+				d.vertices[i+3],
+				d.vertices[i+4],
+				d.vertices[i+5]),
+			btVector3(
+				d.vertices[i+6],
+				d.vertices[i+7],
+				d.vertices[i+8]));
 	}
 
+	btBvhTriangleMeshShape* mShape = new btBvhTriangleMeshShape(triMesh,true);
 	btVector3 localInertia(0,0,0);
 	btCollisionObject* actor = new btCollisionObject();
-	actor->setCollisionShape(mShapes[meshname]);
+	actor->setCollisionShape(mShape);
 	actor->setWorldTransform(btTransform(btQuaternion::getIdentity(),btVector3(pos.x,pos.y,pos.z)));
-	actor->setRestitution(0.1f);
-	actor->setFriction(1.5f);
-	//actor->setAnisotropicFriction(btVector3(0.8f,0.8f,0.8f));
+	actor->setRestitution(0.f);
+	actor->setFriction(0.f);
 	mDynamicsWorld->addCollisionObject(actor,COLLISION_GROUP_1);
-	mObjects.push_back(new PhysicsObject(actor,mDynamicsWorld));
-
-	if(newShape)
-	{
-		delete[] vertices;
-		delete[] indices;
-	}
-
-	return mObjects[mObjects.size()-1];
-	//return NULL;
+	//mObjects.push_back(new PhysicsObject(actor,mDynamicsWorld));
+	Trimesh out = {actor, triMesh, mShape};
+	return out;
 }
 
-PhysicsObject* PhysicsMgr::createStaticTrimesh(GfxObject* object,Ogre::Vector3 pos)
-{
-	return createStaticTrimesh(object->getEntity()->getMesh()->getName(),pos);
-}
+//PhysicsObject* PhysicsMgr::createStaticTrimesh(GfxObject* object,Ogre::Vector3 pos)
+//{
+//	return createStaticTrimesh(object->getEntity()->getMesh()->getName(),pos);
+//}
 
 PhysicsObject* PhysicsMgr::createCube(Ogre::Vector3 scale,Ogre::Vector3 pos)
 {
@@ -325,9 +198,35 @@ PhysicsObject* PhysicsMgr::createSphere(float radius,Ogre::Vector3 pos)
 	mShapes["SPHERE"+Ogre::StringConverter::toString(radius)]->calculateLocalInertia(18.f,localInertia);
 
 	btRigidBody* actor = new btRigidBody(18.f,0,mShapes["SPHERE"+Ogre::StringConverter::toString(radius)],localInertia);	
-	actor->setRestitution(0.3f);
-	actor->setFriction(0.8f);
+	actor->setRestitution(0.f);
+	actor->setFriction(0.f);
 	actor->setAnisotropicFriction(btVector3(0.9f,0.9f,0.9f));
+	actor->setWorldTransform(btTransform(btQuaternion::getIdentity(),btVector3(pos.x,pos.y,pos.z)));
+
+	//dynamic_cast<btDiscreteDynamicsWorld*>(mDynamicsWorld)->addRigidBody(actor,COLLISION_GROUP_2,COLLISION_GROUP_2|COLLISION_GROUP_3|COLLISION_GROUP_1);
+	dynamic_cast<btDiscreteDynamicsWorld*>(mDynamicsWorld)->addRigidBody(actor,COLLISION_GROUP_1,COLLISION_GROUP_1); //if I need collision filtering..
+
+	mObjects.push_back(new PhysicsObject(actor,mDynamicsWorld));
+
+	return mObjects[mObjects.size()-1];
+}
+
+
+PhysicsObject* PhysicsMgr::createCapsule(float radius, float height,Ogre::Vector3 pos)
+{
+	if(mShapes.find("CAPS"+Ogre::StringConverter::toString(radius))==mShapes.end())
+	{
+		btCapsuleShape *sphereShape = new btCapsuleShape(radius, height);
+		mShapes["CAPS"+Ogre::StringConverter::toString(radius)] = (sphereShape);
+	}
+
+	btVector3 localInertia(0,0,0);
+	mShapes["CAPS"+Ogre::StringConverter::toString(radius)]->calculateLocalInertia(18.f,localInertia);
+
+	btRigidBody* actor = new btRigidBody(18.f,0,mShapes["CAPS"+Ogre::StringConverter::toString(radius)],localInertia);	
+	actor->setRestitution(0.f);
+	actor->setFriction(0.f);
+	actor->setAnisotropicFriction(btVector3(0.f,0.f,0.f));
 	actor->setWorldTransform(btTransform(btQuaternion::getIdentity(),btVector3(pos.x,pos.y,pos.z)));
 
 	//dynamic_cast<btDiscreteDynamicsWorld*>(mDynamicsWorld)->addRigidBody(actor,COLLISION_GROUP_2,COLLISION_GROUP_2|COLLISION_GROUP_3|COLLISION_GROUP_1);
@@ -564,4 +463,12 @@ RaycastReport PhysicsMgr::raycastSimple(Ogre::Vector3 pos,Ogre::Vector3 dir,Real
 	{
 		return RaycastReport();
 	}
+}
+
+void Trimesh::kill()
+{
+	Game::getPtr()->getPhysics()->getScene()->removeCollisionObject(actor);
+	delete actor;
+	delete shape;
+	delete mesh;
 }

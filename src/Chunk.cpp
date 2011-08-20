@@ -1,4 +1,6 @@
 #include "Chunk.hpp"
+#include "Game.hpp"
+#include "Physics/PhysicsMgr.hpp"
 
 
 // hacky constants...
@@ -56,10 +58,10 @@ const static int ATLAS_DIM = 4;
 const static Vector2 texcoords[6][4] =
 {
 	{
-		Vector2(0.f/ATLAS_DIM, 1.f/ATLAS_DIM), // 3
-		Vector2(1.f/ATLAS_DIM, 0.f/ATLAS_DIM),// 2
-		Vector2(0.f/ATLAS_DIM, 0.f/ATLAS_DIM),// 0
-		Vector2(1.f/ATLAS_DIM, 1.f/ATLAS_DIM)// 1
+		Vector2(0.f/ATLAS_DIM, 1.f/ATLAS_DIM),
+		Vector2(1.f/ATLAS_DIM, 0.f/ATLAS_DIM),
+		Vector2(0.f/ATLAS_DIM, 0.f/ATLAS_DIM),
+		Vector2(1.f/ATLAS_DIM, 1.f/ATLAS_DIM)
 	},
 	{
 		Vector2(0.f/ATLAS_DIM, 0.f/ATLAS_DIM),
@@ -74,22 +76,22 @@ const static Vector2 texcoords[6][4] =
 		Vector2(0.f/ATLAS_DIM, 1.f/ATLAS_DIM)
 	},
 	{
-		Vector2(0.f/ATLAS_DIM, 1.f/ATLAS_DIM),//3
-		Vector2(1.f/ATLAS_DIM, 0.f/ATLAS_DIM),//2
-		Vector2(0.f/ATLAS_DIM, 0.f/ATLAS_DIM),//0
-		Vector2(1.f/ATLAS_DIM, 1.f/ATLAS_DIM)//1
+		Vector2(0.f/ATLAS_DIM, 1.f/ATLAS_DIM),
+		Vector2(1.f/ATLAS_DIM, 0.f/ATLAS_DIM),
+		Vector2(0.f/ATLAS_DIM, 0.f/ATLAS_DIM),
+		Vector2(1.f/ATLAS_DIM, 1.f/ATLAS_DIM)
 	},
 	{
-		Vector2(1.f/ATLAS_DIM, 0.f/ATLAS_DIM),//2
-		Vector2(0.f/ATLAS_DIM, 1.f/ATLAS_DIM),//3
-		Vector2(1.f/ATLAS_DIM, 1.f/ATLAS_DIM),//1
-		Vector2(0.f/ATLAS_DIM, 0.f/ATLAS_DIM)//0
+		Vector2(1.f/ATLAS_DIM, 0.f/ATLAS_DIM),
+		Vector2(0.f/ATLAS_DIM, 1.f/ATLAS_DIM),
+		Vector2(1.f/ATLAS_DIM, 1.f/ATLAS_DIM),
+		Vector2(0.f/ATLAS_DIM, 0.f/ATLAS_DIM)
 	},
 	{
-		Vector2(0.f/ATLAS_DIM, 1.f/ATLAS_DIM),//2
-		Vector2(1.f/ATLAS_DIM, 0.f/ATLAS_DIM),//3
-		Vector2(1.f/ATLAS_DIM, 1.f/ATLAS_DIM),//1
-		Vector2(0.f/ATLAS_DIM, 0.f/ATLAS_DIM)//0
+		Vector2(0.f/ATLAS_DIM, 1.f/ATLAS_DIM),
+		Vector2(1.f/ATLAS_DIM, 0.f/ATLAS_DIM),
+		Vector2(1.f/ATLAS_DIM, 1.f/ATLAS_DIM),
+		Vector2(0.f/ATLAS_DIM, 0.f/ATLAS_DIM)
 	}
 };
 
@@ -109,24 +111,6 @@ void makeQuad(MeshData& m, int direction, byte x, byte y, byte z, byte t, byte c
 	VERT(0,atlas)
 	VERT(3,atlas)
 	VERT(1,atlas)
-
-	/*m.texcoords[0].push_back(1.f);
-	m.texcoords[0].push_back(1.f);
-
-	m.texcoords[0].push_back(0.f);
-	m.texcoords[0].push_back(0.f);
-
-	m.texcoords[0].push_back(0.f);
-	m.texcoords[0].push_back(1.f);
-
-	m.texcoords[0].push_back(0.f);
-	m.texcoords[0].push_back(0.f);
-
-	m.texcoords[0].push_back(1.f);
-	m.texcoords[0].push_back(0.f);
-
-	m.texcoords[0].push_back(1.f);
-	m.texcoords[0].push_back(1.f);*/
 }
 
 Chunk::Chunk(Vector3 pos)
@@ -168,12 +152,7 @@ void Chunk::build()
 		if(k == DEPTH-1 && prev && prev->data[i][j][0])
 			makeQuad(d, 5, i, j, k, prev->data[i][j][0], 0);
 	}
-	//makeQuad(d, 0, 0, 0, 0, 0);
-	//makeQuad(d, 1, 0, 0, 0, 0);
-	//makeQuad(d, 2, 0, 0, 0, 0);
-	//makeQuad(d, 3, 0, 0, 0, 0);
-	//makeQuad(d, 4, 0, 0, 0, 0);
-	//makeQuad(d, 5, 0, 0, 0, 0);
 	
 	obj->load(d); 
+	tm = Game::getPtr()->getPhysics()->createStaticTrimesh(d, obj->getNode()->getPosition());
 }

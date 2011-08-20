@@ -3,6 +3,7 @@
 
 #include "Object.hpp"
 #include "Gfx/GfxObject.hpp"
+#include "Physics/PhysicsMgr.hpp"
  
 #define WIDTH 7
 #define HEIGHT 7
@@ -25,6 +26,7 @@ public:
 	MeshData d;
 	Vector3 position;
 	GfxObject* obj;
+	Trimesh tm;
 
 };
 

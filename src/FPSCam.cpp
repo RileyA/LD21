@@ -41,7 +41,7 @@ void FPSCam::update(Real delta)
 { 
 	Real speed = 10.f;
 
-	camPos->setPosition(
+	/*camPos->setPosition(
 		camPos->getPosition() + 
 		((mGame->getInput()->isKeyDown("KC_W") - 
 			mGame->getInput()->isKeyDown("KC_S")) *
@@ -49,7 +49,7 @@ void FPSCam::update(Real delta)
 		((mGame->getInput()->isKeyDown("KC_D") - 
 			mGame->getInput()->isKeyDown("KC_A")) * 
 				mCamera->getDerivedRight() * speed * delta)
-	);
+	);*/
 }
 
 void FPSCam::look(const Message& m)
