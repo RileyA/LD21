@@ -33,6 +33,8 @@ public:
 		bool changedCourse;
 		Real life;
 		Real delay;
+		int type;
+		PhysicsObject* box;
 	};
 
 	void makeDebris(Chunk* c, int type, int i, int j, int k);

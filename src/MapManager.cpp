@@ -124,6 +124,7 @@ void MapManager::update(Real delta)
 			continue;
 		}
 		(*it)->node->translate((*it)->dir * delta * 1.5f);
+		(*it)->box->setPosition((*it)->node->getPosition());
 		(*it)->dist += delta * 0.75f;
 		(*it)->life -= delta;
 		if((*it)->dist > 1.2f && !(*it)->changedCourse)
@@ -139,6 +140,7 @@ void MapManager::update(Real delta)
 		if((*it)->life <= 0.f)
 		{
 			(*it)->node->setVisible(false);
+			(*it)->node->getParentSceneNode()->removeChild((*it)->node);
 			mSpareDebris.push_back((*it));
 			it = mDebris.erase(it);
 		}
@@ -206,18 +208,32 @@ void MapManager::makeDebris(Chunk* c, int type, int i, int j, int k)
 	Debris* d = 0;
 	if(!mSpareDebris.empty())
 	{
-		d = mSpareDebris.front();
-		mSpareDebris.pop_front();
+		std::list<Debris*>::iterator it = mSpareDebris.begin();
+		for(it; it != mSpareDebris.end(); ++it)
+		{
+			if((*it)->type == type)
+			{
+				d = (*it);
+				mSpareDebris.erase(it);
+				break;
+			}
+		}
 	}
-	else
+	if(!d)
 	{
 		d = new Debris();
-		d->node = mGame->getGfx()->getSceneManager()->getRootSceneNode()->createChildSceneNode();
-		d->entity = mGame->getGfx()->getSceneManager()->createEntity("Debris.mesh");
+		d->node = mGame->getGfx()->getSceneManager()->createSceneNode();
+		d->entity = mGame->getGfx()->getSceneManager()->createEntity("Debris" + StringUtils::toString(type)  + ".mesh");
+		d->type = type;
 		d->node->attachObject(d->entity);
+		d->box = mGame->getPhysics()->createCube(Vector3(0.5f,0.5f,0.5f), Vector3(0,0,0));
+		d->box->setKinematic(true);
 	}
 
 	mDebris.push_back(d);
+	Vector3 p = c->obj->getNode()->getPosition() + Vector3(i,j,k);
+	d->node->setPosition(p);
+	d->box->setPosition(p);
 
 	d->dir = Vector3(0,0,1);
 
@@ -230,12 +246,11 @@ void MapManager::makeDebris(Chunk* c, int type, int i, int j, int k)
 	else if(j == 6)
 		d->dir = Vector3(0,1,0);
 
-	d->node->setVisible(false);
+	mGame->getGfx()->getSceneManager()->getRootSceneNode()->addChild(d->node);
+	d->node->setVisible(true);
 	d->changedCourse = false;
 	d->dist = 0.f;
 	d->delay = Rand::randFloat(0.f,0.375f);
-	d->entity->setMaterialName("atlas_" + StringUtils::toString(type));
-	d->node->setPosition(c->obj->getNode()->getPosition() + Vector3(i,j,k));
 	d->life = 0.5f;
 }
 
@@ -244,19 +259,32 @@ void MapManager::makeDebrisEx(Chunk* c, int type, int i, int j, int k)
 	Debris* d = 0;
 	if(!mSpareDebris.empty())
 	{
-		d = mSpareDebris.front();
-		mSpareDebris.pop_front();
+		std::list<Debris*>::iterator it = mSpareDebris.begin();
+		for(it; it != mSpareDebris.end(); ++it)
+		{
+			if((*it)->type == type)
+			{
+				d = (*it);
+				mSpareDebris.erase(it);
+				break;
+			}
+		}
 	}
-	else
+	if(!d)
 	{
 		d = new Debris();
-		d->node = mGame->getGfx()->getSceneManager()->getRootSceneNode()->createChildSceneNode();
-		d->entity = mGame->getGfx()->getSceneManager()->createEntity("Debris.mesh");
+		d->node = mGame->getGfx()->getSceneManager()->createSceneNode();
+		d->type = type;
+		d->entity = mGame->getGfx()->getSceneManager()->createEntity("Debris" + StringUtils::toString(type)  + ".mesh");
 		d->node->attachObject(d->entity);
+		d->box = mGame->getPhysics()->createCube(Vector3(0.5f,0.5f,0.5f), Vector3(0,0,0));
+		d->box->setKinematic(true);
 	}
 
 	mDebris.push_back(d);
-	d->node->setPosition(c->obj->getNode()->getPosition() + Vector3(i,j,k));
+	Vector3 p = c->obj->getNode()->getPosition() + Vector3(i,j,k);
+	d->node->setPosition(p);
+	d->box->setPosition(p);
 
 	d->dir = d->node->getPosition();
 	d->dir.x *= Rand::randFloat(0.2f, 2.f);
@@ -265,10 +293,10 @@ void MapManager::makeDebrisEx(Chunk* c, int type, int i, int j, int k)
 	d->dir.normalise();
 	d->dir *= Rand::randFloat(1.5f, 3.5f);
 
-	d->node->setVisible(false);
+	mGame->getGfx()->getSceneManager()->getRootSceneNode()->addChild(d->node);
+	d->node->setVisible(true);
 	d->changedCourse = true;
 	d->dist = 5.f;
-	d->entity->setMaterialName("atlas_" + StringUtils::toString(type));
 	d->life = Rand::randFloat(0.5f,1.25f);
 	d->delay = Rand::randFloat(0.f,0.375f);
 }

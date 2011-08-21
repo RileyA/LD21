@@ -175,9 +175,9 @@ PhysicsObject* PhysicsMgr::createCube(Ogre::Vector3 scale,Ogre::Vector3 pos)
 	mShapes["BOX"+Ogre::StringConverter::toString(scale)]->calculateLocalInertia(18.f,localInertia);
 
 	btRigidBody* actor = new btRigidBody(18.f,0,mShapes["BOX"+Ogre::StringConverter::toString(scale)],localInertia);	
-	actor->setRestitution(0.3f);
-	actor->setFriction(0.8f);
-	actor->setAnisotropicFriction(btVector3(0.9f,0.9f,0.9f));
+	actor->setRestitution(0.f);
+	actor->setFriction(0.f);
+	actor->setAnisotropicFriction(btVector3(0.f,0.f,0.f));
 	actor->setWorldTransform(btTransform(btQuaternion::getIdentity(),btVector3(pos.x,pos.y,pos.z)));
 
 	dynamic_cast<btDiscreteDynamicsWorld*>(mDynamicsWorld)->addRigidBody(actor,COLLISION_GROUP_1,COLLISION_GROUP_1);

@@ -35,6 +35,12 @@ public:
 
 	Real backAngle;
 
+	/*struct Shot
+	{
+		Ogre::SceneNode* node;
+		Ogre::Entity* ent;
+	};*/
+
 };
 
 #endif
