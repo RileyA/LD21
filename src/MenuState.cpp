@@ -9,6 +9,8 @@
 #include "MapManager.hpp"
 #include "TitleState.hpp"
 
+int lastScore = 0;
+
 MenuState::MenuState()
 	:State()
 {
@@ -42,13 +44,31 @@ void MenuState::init()
 	b->getLayer(1)->createRectangle((w-47)/2,(h-47)/2,47,47)->setSprite("reticle");
 	mGfx->createGui(b);
 
-	mm = new MapManager(mGfx->mCamera);
+	for(int i = 0; i < 20; ++i)
+	{
+		rects[i] = b->getLayer(1)->createRectangle((w-(20*12 + 19*6))/2 + i*18, h - 42, 12, 25, 50,50,50);
+	}
 
 	player = new Player();
+
+	for(int i = 0; i < 20; ++i)
+	{
+		if(player->speedp >= i)
+			rects[i]->setColor(60,255,120, 150);
+		else
+			rects[i]->setColor(100,100,100,150);
+	}
+
+	b->getLayer(1)->createRectangle((w-47)/2,(h-47)/2,47,47)->setSprite("reticle");
+
+	mm = new MapManager(mGfx->mCamera);
+
 
 	mGfx->getSceneManager()->setFog(Ogre::FOG_EXP,Ogre::ColourValue(0,0,0),
 		0.03f,15.f,75.f);
 	maxDist = 0.f;
+
+	mGfx->setupViewp();
 
 }
 
@@ -63,16 +83,27 @@ void MenuState::update(Real delta)
 	if(d > maxDist)
 	{
 		maxDist = d;
-		dist->setCaption("Distance: "+StringUtils::toString(maxDist) + "m");
+		//dist->setCaption("Distance: "+StringUtils::toString(maxDist) + "m");
+	}
+
+	for(int i = 0; i < 20; ++i)
+	{
+		if(player->speedp >= i)
+			rects[i]->setColor(60,255,120, 150);
+		else
+			rects[i]->setColor(100,100,100,150);
 	}
 	
 	if(fabs(mGfx->mCamera->getDerivedPosition().x) > 7.75f ||
 		fabs(mGfx->mCamera->getDerivedPosition().y) > 7.75f ||
 		mGfx->mCamera->getDerivedPosition().z > mm->destruction + 50)
 	{
+		Game::getPtr()->getAudio()->play2D("media/audio/fail.wav");
+		lastScore = maxDist;
 		mGame->addState(new TitleState());
 		setDone(true);
 	}
+
 
 	//if(mTimeElapsed > 5.f)
 	if(mGame->getPtr()->getInput()->wasKeyPressed("KC_ESCAPE"))

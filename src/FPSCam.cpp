@@ -15,6 +15,7 @@ FPSCam::FPSCam(Ogre::Camera* c)
 	mSmgr->getRootSceneNode()->addChild(camPos);
 	camPos->addChild(camPos2);
 	camPos2->addChild(camYaw);
+	camPos2->attachObject(mGame->getGfx()->mCamera2);
 	camYaw->addChild(camPitch);
 	camPitch->addChild(camRoll);
 	camRoll->attachObject(mCamera);

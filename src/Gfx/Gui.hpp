@@ -18,6 +18,7 @@ public:
 		mRenderOp.vertexData = 0;
 		mRenderOp.indexData = 0;
 		mBatch = b;
+		t = 0;
 		const Oyster::Mesh& m = mBatch->getMesh();
 		buildMesh(m.getVertexCount(), m.getFaceCount(), m.getVertices(), m.getTexcoords(), m.getColors(), m.getIndices());
 	}
@@ -61,6 +62,7 @@ private:
 	size_t mVertexCount;
 
 	bool mVisible;
+	int t;
 
 };
 

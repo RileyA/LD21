@@ -2,6 +2,7 @@
 
 void Gui::update()
 {
+	t = 0;
 	Oyster::DirtyFlags f = mBatch->update();	
 	const Oyster::Mesh& m = mBatch->getMesh();
 
@@ -151,8 +152,9 @@ void Gui::updateColors(float* colors)
 
 void Gui::renderQueueEnded(Ogre::uint8 id, const Ogre::String& invocation, bool& repeat)
 {
-	if (!mVisible || id != Ogre::RENDER_QUEUE_OVERLAY)
+	if (t || !mVisible || id != Ogre::RENDER_QUEUE_OVERLAY)
 		return;
+	++t;
 
 	// setup uniform matrices
 	Ogre::Root::getSingletonPtr()->getRenderSystem()->_setWorldMatrix( Ogre::Matrix4::IDENTITY );

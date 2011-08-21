@@ -52,6 +52,8 @@ public:
 	std::list<Debris*> mDebris;
 	std::list<Debris*> mSpareDebris;
 
+	Real ds;
+
 	Real delay;
 
 };

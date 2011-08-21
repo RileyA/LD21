@@ -56,13 +56,46 @@ void TitleState::init()
 	t1->setAlign(Oyster::HA_CENTER);
 	t1->setColor(150,210,255, 255);
 
-	for(int i = 0; i < 5; ++i)
+	std::vector<int> scores;
+
+	std::ifstream file("scores.txt");
+	while(file.is_open() && file.good())
 	{
-		t1 = b->getLayer(1)->createText(StringUtils::toString(i + 1) + ": " 
-			+ StringUtils::toString((5-i) * 1432), (w - 300)/2 + 82, hh + 342 + i * 35, w, 100);
-		t1->setAlign(Oyster::HA_LEFT);
-		t1->setColor(150,210,255, 255);
+		int temp;
+		file>>temp;
+		scores.push_back(temp);
 	}
+
+	scores.push_back(lastScore);
+	std::sort(scores.begin(), scores.end());
+	std::reverse(scores.begin(), scores.end());
+
+	bool highlit = false;
+
+	for(int i = 0; i < 5 && i < scores.size(); ++i)
+	{
+		if(scores[i] == 0)
+			break;
+		t1 = b->getLayer(1)->createText(StringUtils::toString(i+1) + ": " 
+			+ StringUtils::toString(scores[i]), (w - 300)/2 + 82, hh + 342 + i * 35, w, 100);
+		t1->setAlign(Oyster::HA_LEFT);
+
+		if(lastScore == scores[i] && !highlit)
+		{
+			t1->setColor(255,200,170, 255);
+			highlit = true;
+		}
+		else
+			t1->setColor(150,210,255, 255);
+		
+	}
+
+	std::ofstream f("scores.txt");
+	for(int i = 0; i < scores.size() && i < 5; ++i)
+	{
+		f<<scores[i]<<" ";
+	}
+	f.close();
 
 	r = b->getLayer(1)->createRectangle((w - 300)/2, hh+332, 300,1, 255, 255, 255);
 	r->setColor(150,210,255, 255);
@@ -72,7 +105,9 @@ void TitleState::init()
 	r->setColor(150,210,255, 255);
 
 	mGfx->createGui(b);
+
 }
+
 
 void TitleState::deinit()
 {
@@ -84,6 +119,7 @@ void TitleState::update(Real delta)
 	if(mGame->getPtr()->getInput()->wasKeyPressed("KC_RETURN"))
 	{
 		mGame->addState(new MenuState());
+		Game::getPtr()->getAudio()->play2D("media/audio/start.wav");
 		setDone(true);
 	}
 

@@ -67,6 +67,10 @@ void AudioMgr::init()
 			b++;
 		}
 		mInitialized = true;
+		SoundPtr s = play2D("media/audio/crappymusic.wav");
+		s.getData().mLooping = true;
+		s.getData().mGain = 0.03;
+		getActiveSound(s.getIndex())->updateData();
 	}
 }
 //-----------------------------------------------------------------------

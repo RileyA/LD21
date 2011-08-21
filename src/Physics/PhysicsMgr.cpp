@@ -30,10 +30,10 @@ void PhysicsMgr::init()
 
 	mDynamicsWorld = new btDiscreteDynamicsWorld(mDispatcher,mBroadphase,mSolver,mCollisionConfiguration);
 
-	mDynamicsWorld->setGravity(btVector3(0,-9.8,0));
-	mGlobalGravity = Ogre::Vector3(0,-9.8,0);
+	mDynamicsWorld->setGravity(btVector3(0,0,0));
+	mGlobalGravity = Ogre::Vector3(0,0,0);
 
-	mTimeStep = 1.f/300.f;
+	mTimeStep = 1.f/250.f;
 	mAccumulation = 0.f;
 	mInterpolation = 0.f;
 	started = true;

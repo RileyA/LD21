@@ -40,6 +40,14 @@ Player::Player()
 	mSph->setUserData(dat);
 	mCap->setUserData(dat);
 	mCap2->setUserData(dat);
+
+	minSpeed = 8.f;
+	maxSpeed = 28.f;
+	speed = 10.f;
+	lastPos = Vector3(0,0,0);
+	speedp = 4;
+	speedprog = 0.f;
+	slowtimer = 0.1f;
 }
 
 Player::~Player()
@@ -55,6 +63,8 @@ Player::~Player()
 // here be dragons
 void Player::update(Real delta)
 {
+	speedprog -= delta;
+	slowprog -= delta;
 	// wait a few frames so loading hiccups don't cause the controller to tunnel
 	--skipFrame;
 	if(skipFrame > 0)
@@ -66,7 +76,55 @@ void Player::update(Real delta)
 	if(jumpFactor < 0.f)
 		jumpFactor = 0.f;
 
-	Real speed = 10.f;
+	Real spd = fabs(lastPos.z - mController->getPosition().z) / delta;
+
+	Vector3 norm = mCam->camPos->_getDerivedOrientation() * Vector3(0,-1,0);
+	RaycastReport rr = Game::getPtr()->getPhysics()->raycastSimple(mController->getPosition()
+		,norm, 0.93f, 0, COLLISION_GROUP_2);
+	
+	onGround = rr.hit && norm.angleBetween(-rr.normal) < Ogre::Radian(Ogre::Degree(2.f));
+
+	if(spd < minSpeed)
+	{
+		slowtimer -= delta;
+		if(slowtimer < 0.f&& speedp > 0)
+		{
+			--speedp;
+			slowtimer = 0.1f;
+			Game::getPtr()->getAudio()->play2D("media/audio/crash.wav");
+		}
+	}
+	else
+	{
+		slowtimer += delta;
+		if(slowtimer > 0.1f)
+			slowtimer = 0.1f;
+	}
+
+	//std::cout<<spd<<"\n";
+	//speed = spd + 0.2f;
+	//
+
+	//if(speed > spd + 4.f)
+	//	speed = speed - 3.f;
+	//
+
+	// we you crash, you have to start over...
+		
+	lastPos = mController->getPosition();
+
+	speed = minSpeed + 0.8f + speedp * 1.f;
+
+	speedp = std::min(speedp, 20);
+
+	//std::cout<<speedp<<"\n";
+
+	if(speed < minSpeed)
+		speed = minSpeed;
+
+	if(speed > maxSpeed)
+		speed = maxSpeed;
+
 	Vector3 v = (mGame->getGfx()->mCamera->getParentSceneNode()->getParentSceneNode()->_getDerivedOrientation()) * Vector3::NEGATIVE_UNIT_Z;
 
 	Ogre::Plane pln(mCam->camPos->_getDerivedOrientation() * Vector3::UNIT_Y, 0);	
@@ -75,16 +133,18 @@ void Player::update(Real delta)
 	v *= speed;// * mGame->getInput()->isKeyDown("KC_UP");
 	Vector3 gravity = mCam->camPos->_getDerivedOrientation() * Vector3::NEGATIVE_UNIT_Y;
 	gravity.normalise();
+	if(onGround)
+		gravity *= 0.1f;
+	if(rotating)
+		gravity = Vector3::ZERO;
 	v += gravity * (5-jumpFactor) * 3;
 	mController->setVelocity(v);
 	if(mGame->getPtr()->getInput()->wasKeyPressed("KC_P"))
 		mController->setPosition(Vector3(0,0,0));
 
-	Vector3 norm = mCam->camPos->_getDerivedOrientation() * Vector3(0,-1,0);
-	RaycastReport rr = Game::getPtr()->getPhysics()->raycastSimple(mController->getPosition()
-		,norm, 0.93f, 0, COLLISION_GROUP_2);
-	
-	onGround = rr.hit && norm.angleBetween(-rr.normal) < Ogre::Radian(Ogre::Degree(2.f));
+
+	if(onGround)
+		speed += delta;
 
 	if(rr.hit)
 	{
@@ -94,6 +154,25 @@ void Player::update(Real delta)
 			if(d->c)
 			{
 				int floor = d->c->getBlock(rr.hitP, rr.normal);
+				if(floor == 4)
+				{
+					if(lastFloor != 4 && speedprog <= 0.f)
+					{
+						++speedp;
+						speedprog = 0.3f;
+						Game::getPtr()->getAudio()->play2D("media/audio/upspeed.wav");
+					}
+				}
+				if(floor == 5)
+				{
+					if(lastFloor != 5 && speedprog <= 0.f)
+					{
+						--speedp;
+						slowprog = 0.3f;
+						Game::getPtr()->getAudio()->play2D("media/audio/lowerspeed.wav");
+					}
+				}
+				lastFloor = floor;
 			}
 			else if(d->type)
 			{
@@ -127,7 +206,6 @@ void Player::update(Real delta)
 				offset = Vector3(0,0.5,0);
 				mController->setLinearFactor(Vector3(1,1,1));
 			}	
-
 		}
 		else
 		{
@@ -202,7 +280,7 @@ void Player::update(Real delta)
 	if(rotating)
 	{
 		// advance cam animation
-		if(delta*180 >= rotation)
+		if(delta*260 >= rotation)
 		{
 			mCam->camPos->roll(Ogre::Degree(rotation * (-1 + leftrot*2)));
 			rotation = 0.f;
@@ -210,8 +288,8 @@ void Player::update(Real delta)
 		}
 		else
 		{
-			rotation -= delta*180;
-			mCam->camPos->roll(Ogre::Degree(delta*180 * (-1 + leftrot*2)));
+			rotation -= delta*260;
+			mCam->camPos->roll(Ogre::Degree(delta*260 * (-1 + leftrot*2)));
 		}
 	}
 
@@ -234,13 +312,15 @@ void Player::update(Real delta)
 		}
 	}
 
-	mCam->camPos->setPosition(mController->getPosition());
+	Vector3 cpos = mController->getPosition();
+
+	mCam->camPos->setPosition(cpos);
 	mCam->camPos2->setPosition(verticalOffset);
 
-	if(mGame->getPtr()->getInput()->isKeyDown("KC_W") && onGround && jumpFactor < 5.f)
+	if(mGame->getPtr()->getInput()->isButtonDown("MB_Left") && onGround && jumpFactor < 5.f)
 		jumpFactor = 10.45f;
 
-	if(mGame->getPtr()->getInput()->wasKeyPressed("KC_A") && !rotating)
+	if(mGame->getPtr()->getInput()->isKeyDown("KC_A") && !rotating)
 	{
 		//mCam->camPos->roll(Ogre::Degree(90.f));
 		Vector3 pos = mController->getPosition();
@@ -253,8 +333,9 @@ void Player::update(Real delta)
 		mController->setPosition(pos + mCam->camPos->_getDerivedOrientation() * (Vector3(0,-0.5f,0) + offset));
 		offset = Vector3(0,0.5,0);
 		mController->setLinearFactor(Vector3(1,1,1));
+		jumpFactor += 6.f;
 	}
-	else if(mGame->getPtr()->getInput()->wasKeyPressed("KC_D") && !rotating)
+	else if(mGame->getPtr()->getInput()->isKeyDown("KC_D") && !rotating)
 	{
 		Vector3 pos = mController->getPosition();
 		leftrot = true;
@@ -266,18 +347,25 @@ void Player::update(Real delta)
 		mController->setPosition(pos + mCam->camPos->_getDerivedOrientation() * (Vector3(0,-0.5f,0) + offset));
 		offset = Vector3(0,0.5,0);
 		mController->setLinearFactor(Vector3(1,1,1));
+		jumpFactor += 6.f;
 	}
 
-	if(!crouching && mGame->getPtr()->getInput()->wasKeyPressed("KC_S"))
+	if(!rotating && !crouching && !crouched && mGame->getPtr()->getInput()->isButtonDown("MB_Right"))
 	{
 		crouching = true;
 		crouchTime = 0.1f;
 	}
 
-	if(mGame->getInput()->isButtonDown("MB_Right"))
+	if(!rotating && !crouching && crouched && !mGame->getPtr()->getInput()->isButtonDown("MB_Right"))
+	{
+		crouching = true;
+		crouchTime = 0.1f;
+	}
+
+	/*if(mGame->getInput()->isKeyDown("KC_S"))
 	{
 		mCam->invert = true;
-		if(backAngle + delta*1080.f >= 180.f)
+		if(backAngle + delta*1500.f >= 180.f)
 		{
 			Real a = 180.f - backAngle;
 			mCam->camRoll->yaw(Ogre::Degree(a));
@@ -285,14 +373,14 @@ void Player::update(Real delta)
 		}
 		else if(backAngle < 180.f)
 		{
-			backAngle += delta * 1080;
-			mCam->camRoll->yaw(Ogre::Degree(delta * 1080));
+			backAngle += delta * 1500;
+			mCam->camRoll->yaw(Ogre::Degree(delta * 1500));
 		}
 	}
 	else
 	{
 		mCam->invert = false;
-		if(backAngle - delta*1080.f <= 0.f)
+		if(backAngle - delta*1500.f <= 0.f)
 		{
 			Real a = 180.f - backAngle;
 			mCam->camRoll->yaw(-Ogre::Degree(backAngle));
@@ -301,14 +389,14 @@ void Player::update(Real delta)
 		}
 		else if(backAngle > 0.f)
 		{
-			backAngle -= delta * 1080;
-			mCam->camRoll->yaw(-Ogre::Degree(delta * 1080));
+			backAngle -= delta * 1500;
+			mCam->camRoll->yaw(-Ogre::Degree(delta * 1500));
 		}
-	}
+	}*/
 	
 
-	if(mGame->getPtr()->getInput()->wasButtonPressed("MB_Left"))
-		shoot();
+	//if(mGame->getPtr()->getInput()->wasKeyPressed("KC_W"))
+	//	shoot();
 
 	updateShots(delta);
 

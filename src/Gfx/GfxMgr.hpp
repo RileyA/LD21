@@ -32,6 +32,7 @@ public:
 	void endState();
 
     Ogre::Camera* mCamera;
+    Ogre::Camera* mCamera2;
 
 	Gui* createGui(Oyster::Batch* b); 
 
@@ -41,6 +42,8 @@ public:
 	{
 		mObjs.push_back(obj);
 	}
+
+	void setupViewp();
 
 	void removeGfxObject(GfxObject* obj);
 
@@ -54,6 +57,7 @@ public:
     Ogre::SceneManager* mSmgr;
     Ogre::RenderWindow* mWindow;
     Ogre::Viewport* mViewport;
+    Ogre::Viewport* mViewport2;
 	Oyster::Oyster* mOyster;
 
 	std::vector<Gui*> mGuis;

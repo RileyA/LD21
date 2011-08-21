@@ -3,14 +3,16 @@
 
 typedef signed char int8;
 
+
 MapManager::MapManager(Ogre::Camera* cam)
 {
 	mCam = cam;
 	genTo = 5;
 	buildTo = 4;
 	gennedTo = 0;
-	destruction = 20.f;
+	destruction = 5.f;
 	delay = 1.f;
+	ds = 12.f;
 }
 
 MapManager::~MapManager()
@@ -41,7 +43,7 @@ int8 getNormalBlock()
 	else if(a < 93)
 		return 2;
 	else if(a < 95)
-		return 3;
+		return 6;
 	else
 		return 6;
 }
@@ -52,16 +54,16 @@ int8 getTrackBlock(int seed)
 		return 1;
 	else if(seed < 375)
 		return getNormalBlock();
-	else if(seed < 415)
-		return rand()%3 == 1 ? getNormalBlock() : 2;
 	else if(seed < 455)
+		return rand()%3 == 1 ? getNormalBlock() : 2;
+	else if(seed < 475)
 		return 4;
 	else if(seed < 495)
 		return 5;
 	else if(seed < 499)
 		return 6;
 	else
-		return 3;
+		return 6;
 }
 
 void MapManager::update(Real delta)
@@ -79,7 +81,13 @@ void MapManager::update(Real delta)
 	if(dist + genTo > gennedTo)
 		gen(dist);
 
-	destruction -= delta * 10;
+	destruction -= delta * ds;
+
+	if(mGame->getGfx()->mCamera->getDerivedPosition().z - destruction <= -100)
+	{
+		destruction = mGame->getGfx()->mCamera->getDerivedPosition().z + 25;
+		ds += 0.5f;
+	}
 
 	delay -=delta;
 
@@ -273,9 +281,9 @@ void MapManager::gen(int d)
 
 			obs -= 1;
 
-			if(obs <= 0)
+			if(obs <= 0 && gennedTo > 3)
 			{
-				obs = rand()%3+5;
+				obs = rand()%8+5;
 				int typ = rand()%4;
 				// column
 				{

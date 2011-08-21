@@ -10,6 +10,7 @@ GfxMgr::GfxMgr()
     mInitialized(false)
 {
 	numShots = 0;
+	mViewport2 = 0;;
 }
 //---------------------------------------------------------------------------
 
@@ -22,8 +23,8 @@ GfxMgr::~GfxMgr()
 void GfxMgr::init()
 {
 	// you didn't see anything...
-	mWidth = 1200;
-	mHeight = 800;
+	mWidth = 1024;
+	mHeight = 768;
 	init(mWidth, mHeight, false, false);
 	mOyster = new Oyster::Oyster(mWidth,mHeight);
 }
@@ -70,6 +71,12 @@ void GfxMgr::init(uint resX,uint resY,bool vsync,bool fullscreen)
         mCamera->setNearClipDistance(0.01f);
         mCamera->setFOVy(Ogre::Radian(Ogre::Degree(60)));
 
+        mCamera2 = mSmgr->createCamera("mCamera2");
+        mCamera2->setPosition(0,0,0);
+        mCamera2->setDirection(0,0,1);
+        mCamera2->setFarClipDistance(300);
+        mCamera2->setNearClipDistance(0.01f);
+        mCamera2->setFOVy(Ogre::Radian(Ogre::Degree(60)));
 		//mCamera->setPosition(0,0,-1.5f);
 
 
@@ -94,6 +101,12 @@ void GfxMgr::init(uint resX,uint resY,bool vsync,bool fullscreen)
     }
 }
 //---------------------------------------------------------------------------
+
+void GfxMgr::setupViewp()
+{
+	mViewport2 = mWindow->addViewport(mCamera2, 2, 0.65, 0.0, 0.35, 0.35);
+	mViewport2->setMaterialScheme("win");
+}
 
 void GfxMgr::deinit()
 {
@@ -134,6 +147,8 @@ void GfxMgr::endState()
 	mObjs.clear();
 	delete mOyster;
 	mOyster = new Oyster::Oyster(mWidth,mHeight);
+	if(mViewport2)
+		mWindow->removeViewport(2);
 }
 
 Gui* GfxMgr::createGui(Oyster::Batch* b)

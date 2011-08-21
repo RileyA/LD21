@@ -31,9 +31,19 @@ public:
 	Real rotation;
 	bool leftrot; 
 
+	float minSpeed;
+	float maxSpeed;
+	float speed;
+	Vector3 lastPos;
+
 	int skipFrame;
 
+	Real slowtimer;
+
 	Real backAngle;
+
+	std::list<float> spds; 
+	std::list<Vector3> cp; 
 
 	struct Shot
 	{
@@ -51,6 +61,11 @@ public:
 
 	void shoot();
 	void updateShots(Real delta);
+
+	int speedp;
+	Real speedprog;
+	Real slowprog;
+	int lastFloor;
 
 	std::list<Shot*> mShots;
 	std::list<Shot*> mSpareShots;
