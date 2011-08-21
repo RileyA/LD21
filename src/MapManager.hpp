@@ -35,6 +35,15 @@ public:
 		Real delay;
 		int type;
 		PhysicsObject* box;
+
+		userdata* dat;
+
+		~Debris()
+		{
+			node->getCreator()->destroyEntity(entity);
+			node->getCreator()->destroySceneNode(node);
+			delete dat;
+		}
 	};
 
 	void makeDebris(Chunk* c, int type, int i, int j, int k);

@@ -1,20 +1,19 @@
-#ifndef MenuState_H
-#define MenuState_H
+#ifndef TitleState_H
+#define TitleState_H
 
 #include "State.hpp"
 
 class FPSCam;
 class Player;
-class MapManager;
 
 // LOL jk, this is actually the gameplay state
 
-class MenuState : public State
+class TitleState : public State
 {
 public:
 
-	MenuState();
-	virtual ~MenuState();
+	TitleState();
+	virtual ~TitleState();
 
 	void init();
 	void deinit();
@@ -24,9 +23,7 @@ protected:
 
 	Real mTimeElapsed;
 	Player* player;
-	Oyster::Text* dist;
 	int maxDist;
-	MapManager* mm;
 
 };
 

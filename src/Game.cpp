@@ -102,8 +102,8 @@ void Game::init()
 	mInput = new InputMgr();
 	mPhysics = new PhysicsMgr();
 
-	mSubsystems.push_back(mInput);
 	mSubsystems.push_back(mGfx);
+	mSubsystems.push_back(mInput);
 	mSubsystems.push_back(mPhysics); 
 	mSubsystems.push_back(mAudio);
 
@@ -139,4 +139,7 @@ void Game::endState()
 		delete it->second;
 	}
 	mBuckets.clear();
+
+	for(int i = 0; i < mSubsystems.size(); ++i)
+		mSubsystems[i]->endState();
 }

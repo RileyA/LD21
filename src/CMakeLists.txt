@@ -24,6 +24,7 @@ set(SOURCE_FILES
 	PhysObj.cpp
 	Chunk.cpp
 	MapManager.cpp
+	TitleState.cpp
 	Player.cpp
 	)
 
@@ -57,6 +58,7 @@ set(HEADER_FILES
 	PhysObj.hpp
 	Chunk.hpp
 	MapManager.hpp
+	TitleState.hpp
 	Player.hpp
 	)
 

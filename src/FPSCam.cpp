@@ -60,9 +60,20 @@ void FPSCam::update(Real delta)
 void FPSCam::look(const Message& m)
 {	
 	const Vector2* v = unpackMsg<Vector2>(m);
-	camYaw->yaw(Ogre::Radian(Ogre::Degree(v->x*-0.35f)));
+	if(v->x * -0.35f > 5.f)
+		camYaw->yaw(Ogre::Radian(Ogre::Degree(5.f)));
+	else if(v->x * -0.35f < -5.f)
+		camYaw->yaw(Ogre::Radian(Ogre::Degree(-5.f)));
+	else
+		camYaw->yaw(Ogre::Radian(Ogre::Degree(v->x*-0.35f)));
 
 	Real tryPitch = v->y*-0.35f * (1 - 2 * invert);
+
+	if(tryPitch > 5.f)
+		tryPitch = 5.f;
+	else if(tryPitch < -5.f)
+		tryPitch = -5.f;
+
 	Real actualPitch = tryPitch;
 
 	if(pitch + tryPitch > 80.f)

@@ -1,6 +1,6 @@
 #ifndef Player_H
 #define Player_H
-
+ 
 #include "FPSCam.hpp"
 #include "PhysicsObject.hpp"
 
@@ -35,11 +35,25 @@ public:
 
 	Real backAngle;
 
-	/*struct Shot
+	struct Shot
 	{
 		Ogre::SceneNode* node;
-		Ogre::Entity* ent;
-	};*/
+		Ogre::Entity* entity;
+		Vector3 direction;
+		bool done;
+		Real timeout;
+		~Shot()
+		{
+			node->getCreator()->destroyEntity(entity);
+			node->getCreator()->destroySceneNode(node);
+		}
+	};
+
+	void shoot();
+	void updateShots(Real delta);
+
+	std::list<Shot*> mShots;
+	std::list<Shot*> mSpareShots;
 
 };
 

@@ -1,6 +1,7 @@
 #include "MapManager.hpp"
 #include "Game.hpp"
 
+typedef signed char int8;
 
 MapManager::MapManager(Ogre::Camera* cam)
 {
@@ -18,10 +19,61 @@ MapManager::~MapManager()
 	for(it; it != mChunks.end(); ++it)
 		delete *it;
 	mChunks.clear();
+
+
+	std::list<Debris*>::iterator i = mDebris.begin();
+	for(i; i != mDebris.end(); ++i)
+		delete *i;
+	mDebris.clear();
+
+	i = mSpareDebris.begin();
+	for(i; i != mSpareDebris.end(); ++i)
+		delete *i;
+	mSpareDebris.clear();
+}
+
+// get a "standard" block to put somewhere
+int8 getNormalBlock()
+{
+	int a = rand()%100;
+	if(a < 80)
+		return 1;
+	else if(a < 93)
+		return 2;
+	else if(a < 95)
+		return 3;
+	else
+		return 6;
+}
+
+int8 getTrackBlock(int seed)
+{
+	if(seed < 150)
+		return 1;
+	else if(seed < 375)
+		return getNormalBlock();
+	else if(seed < 415)
+		return rand()%3 == 1 ? getNormalBlock() : 2;
+	else if(seed < 455)
+		return 4;
+	else if(seed < 495)
+		return 5;
+	else if(seed < 499)
+		return 6;
+	else
+		return 3;
 }
 
 void MapManager::update(Real delta)
 {
+	Chunk* p = mChunks.empty() ? 0 : mChunks.front();
+
+	while(p)
+	{
+		p->upe(delta);
+		p = p->next;
+	}
+	
 	int dist = -mCam->getDerivedPosition().z;
 	dist /= 32;
 	if(dist + genTo > gennedTo)
@@ -182,17 +234,84 @@ void MapManager::gen(int d)
 			mChunks.back()->prev = 0;
 		}
 
-		// do some magic procedural nonsense...
-		for(int i = 0; i < WIDTH; ++i)
+		// do some magic procedural nonsense 
+
+		Chunk* ch = mChunks.back();
+		int tp[4] = {0,0,0,0};
+
+		int obs = 0;
+
+		for(int k = 0; k < DEPTH; ++k)
+		{
+			if(k % 4 == 0)
+			{
+				for(int i = 0; i < 4; ++i)
+					tp[i] = rand()%500;
+			};
+
+			// corners are always normal
+			ch->data[0][0][k] = getNormalBlock();
+			ch->data[6][6][k] = getNormalBlock();
+			ch->data[0][6][k] = getNormalBlock();
+			ch->data[6][0][k] = getNormalBlock();
+
+			// empty out the center
+			for(int i = 1; i < 6; ++i)
+				for(int j = 1; j < 6; ++j)
+			{
+				ch->data[i][j][k] = 0;
+			}
+
+			// generate tracks
+			for(int j = 1; j < 6; ++j)
+			{
+				ch->data[j][0][k] = getTrackBlock(tp[0]);
+				ch->data[j][6][k] = getTrackBlock(tp[1]);
+				ch->data[0][j][k] = getTrackBlock(tp[2]);
+				ch->data[6][j][k] = getTrackBlock(tp[3]);
+			}
+
+			obs -= 1;
+
+			if(obs <= 0)
+			{
+				obs = rand()%3+5;
+				int typ = rand()%4;
+				// column
+				{
+					int axis = rand()%2;
+					int spot = rand()%5 + 1;
+					if(axis)
+						for(int i = 1; i < 6; ++i)
+							ch->data[spot][i][k] = 1;
+					else
+						for(int i = 1; i < 6; ++i)
+							ch->data[i][spot][k] = 1;
+				}
+			}
+		}
+
+
+		/*for(int i = 0; i < WIDTH; ++i)
 			for(int j = 0; j < HEIGHT; ++j)
 				for(int k = 0; k < DEPTH; ++k)
 		{
 			// fill in a tunnel
 			if(i == 0 || i == WIDTH-1 || j == 0 || j== HEIGHT-1)
-				mChunks.back()->data[i][j][k] = rand()%15+1;
-			else
-				mChunks.back()->data[i][j][k] = 0;//!(rand()%100);
-		}
+			{
+				if((i == 0 && j == 0) || (i == 6 && j == 6)
+					(i == 6 && j == 0) || (i == 0 && j == 6))
+				{
+					mChunks.back()->data[i][j][k] = 1;
+				}
+				else
+				{
+					
+				}
+			}
+			//else
+			//	mChunks.back()->data[i][j][k] = 0;//!(rand()%100);
+		}*/
 
 		if(gennedTo > 0)
 		{
@@ -228,6 +347,10 @@ void MapManager::makeDebris(Chunk* c, int type, int i, int j, int k)
 		d->node->attachObject(d->entity);
 		d->box = mGame->getPhysics()->createCube(Vector3(0.5f,0.5f,0.5f), Vector3(0,0,0));
 		d->box->setKinematic(true);
+		d->dat = new userdata;
+		d->dat->c = 0;
+		d->dat->type = type;
+		d->box->setUserData(d->dat);
 	}
 
 	mDebris.push_back(d);
@@ -279,6 +402,10 @@ void MapManager::makeDebrisEx(Chunk* c, int type, int i, int j, int k)
 		d->node->attachObject(d->entity);
 		d->box = mGame->getPhysics()->createCube(Vector3(0.5f,0.5f,0.5f), Vector3(0,0,0));
 		d->box->setKinematic(true);
+		d->dat = new userdata;
+		d->dat->c = 0;
+		d->dat->type = type;
+		d->box->setUserData(d->dat);
 	}
 
 	mDebris.push_back(d);

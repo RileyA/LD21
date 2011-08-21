@@ -204,8 +204,8 @@ bool getCube(Chunk* c, int i, int j, int k)
 #define VERT(N, T) m.vertices.push_back(verts[direction][N].x+x);\
 	m.vertices.push_back(verts[direction][N].y+y);\
 	m.vertices.push_back(verts[direction][N].z+z);\
-	m.texcoords[0].push_back(texcoords[direction][N].x + (1.f/ATLAS_DIM) * (T%ATLAS_DIM));\
-	m.texcoords[0].push_back(texcoords[direction][N].y + (1.f/ATLAS_DIM) * (T/ATLAS_DIM));\
+	m.texcoords[0].push_back(texcoords[direction][N].x + (1.f/ATLAS_DIM) * ((T-1)%ATLAS_DIM));\
+	m.texcoords[0].push_back(texcoords[direction][N].y + (1.f/ATLAS_DIM) * ((T-1)/ATLAS_DIM));\
 	lts[0]=getCube(c,x,y,z,LIGHTING_COORDS[direction][N][0]);\
 	lts[1]=getCube(c,x,y,z,LIGHTING_COORDS[direction][N][1]);\
 	lts[2]=getCube(c,x,y,z,LIGHTING_COORDS[direction][N][0],LIGHTING_COORDS[direction][N][1]);\
@@ -238,11 +238,18 @@ Chunk::Chunk(Vector3 pos)
 	prev = 0;
 	// create node, but not mesh just yet...
 	obj = new GfxObject("test", pos - Vector3(WIDTH/2-0.5f,HEIGHT/2-0.5f,DEPTH/2-0.5f));
+	dat = new userdata;
+	dat->c = this;
+	dat->type = 0;
 }
 
 Chunk::~Chunk()
 {
 	obj->kill();
+	for(int i = 0; i < exps.size(); ++i)
+		delete exps[i];
+	for(int i = 0; i < oexps.size(); ++i)
+		delete oexps[i];
 }
 
 void Chunk::build()
@@ -275,11 +282,41 @@ void Chunk::build()
 	
 	obj->load(d); 
 	tm = Game::getPtr()->getPhysics()->createStaticTrimesh(d, obj->getNode()->getPosition());
+	tm.actor->setUserPointer(dat);
 }
 
 void Chunk::kill()
 {
 	tm.kill();
+}
+
+void Chunk::upe(Real delta)
+{
+	for(int i = 0; i < exps.size(); ++i)
+		if(exps[i]->update(delta))
+		{
+			oexps.push_back(exps[i]);
+			exps.erase(exps.begin() + i);
+			--i;
+		}
+}
+
+void Chunk::makeE(Vector3 pos, Real de)
+{
+	explosion* e  = 0;
+	if(!oexps.empty())
+	{
+		e = oexps.back();
+		oexps.pop_back();
+		exps.push_back(e);
+		e->reac(pos, de);
+	}
+	else
+	{
+		exps.push_back(new explosion(pos));
+		e = exps.back();
+		e->delay = de;
+	}
 }
 
 void Chunk::update()
@@ -318,4 +355,158 @@ void Chunk::update()
 		
 	obj->load(d); 
 	tm = Game::getPtr()->getPhysics()->createStaticTrimesh(d, obj->getNode()->getPosition());
+	tm.actor->setUserPointer(dat);
+}
+
+int8 Chunk::getBlock(Vector3 hit, Vector3 normal)
+{
+	// transform into block space, a magical, poorly defined vector space
+	Vector3 offset =Vector3(WIDTH/2-0.5f,HEIGHT/2-0.5f,DEPTH/2-0.5f); 
+	Vector3 p = hit - obj->getNode()->getPosition();
+	Vector3 loc = p - normal * 0.5f;
+	int x = floor(loc.x + 0.5f);
+	int y = floor(loc.y + 0.5f);
+	int z = floor(loc.z + 0.5f);
+	if(x < 7 && x >= 0 && y >= 0 && y < 7 && z >= 0 && z < 32)
+		return data[x][y][z];
+	return 0;
+}
+
+void explode(std::set<Chunk*>& cs, Chunk* c, int x, int y, int z, Real delay = 0.f)
+{
+	Chunk* cc = c;
+
+	if(z < 0)
+	{
+		z += 32;
+		cc = c->next;
+	}
+	else if(z > 31)
+	{
+		z -= 32;
+		cc = c->prev;
+	}
+
+	if(!cc)
+	{
+		cs.insert(c);
+		return;
+	}
+
+	if(x < 7 && x >= 0 && y >= 0 && y < 7 && z >= 0 && z < 32)
+	{
+		if(cc->data[x][y][z] == 2)
+		{
+			cc->data[x][y][z] = 0;
+			cs.insert(cc);
+			return;
+		}
+		if(cc->data[x][y][z] == 3)
+		{
+			cc->data[x][y][z] = 0;
+			cc->makeE(Vector3(x,y,z) + cc->obj->getNode()->getPosition(), delay);
+			explode(cs, cc, x-1, y, z,delay+0.0175f);
+			explode(cs, cc, x+1, y, z,delay+0.0175f);
+			explode(cs, cc, x, y+1, z,delay+0.0175f);
+			explode(cs, cc, x, y-1, z,delay+0.0175f);
+			explode(cs, cc, x, y, z+1,delay+0.0175f);
+			explode(cs, cc, x, y, z-1,delay+0.0175f);
+			cs.insert(cc);
+			return;
+		}
+		else if(cc->data[x][y][z] != 6)
+		{
+			cc->data[x][y][z] = 0;
+			cs.insert(cc);
+			return;
+		}
+	}
+
+	cs.insert(c);
+}
+
+void Chunk::shootBlock(Vector3 hit, Vector3 normal)
+{
+	// transform into block space, a magical, poorly defined vector space
+	Vector3 offset =Vector3(WIDTH/2-0.5f,HEIGHT/2-0.5f,DEPTH/2-0.5f); 
+	Vector3 p = hit - obj->getNode()->getPosition();
+	Vector3 loc = p - (normal * 0.5f);
+	int x = floor(loc.x + 0.5f);
+	int y = floor(loc.y + 0.5f);
+	int z = floor(loc.z + 0.5f);
+	if(x < 7 && x >= 0 && y >= 0 && y < 7 && z >= 0 && z < 32)
+	{
+		if(data[x][y][z] == 2)
+		{
+			data[x][y][z] = 0;
+			update();
+		}
+		else if(data[x][y][z] == 3)
+		{
+			data[x][y][z] = 0;
+			std::set<Chunk*> c;
+
+			makeE(Vector3(x,y,z) + obj->getNode()->getPosition(), 0.f);
+			explode(c, this, x+1, y, z,0.0175f);
+			explode(c, this, x-1, y, z,0.0175f);
+			explode(c, this, x, y+1, z,0.0175f);
+			explode(c, this, x, y-1, z,0.0175f);
+			explode(c, this, x, y, z+1,0.0175f);
+			explode(c, this, x, y, z-1,0.0175f);
+
+			//c.insert(tryKill(this, x+1, y, z));
+			//c.insert(tryKill(this, x-1, y, z));
+			//c.insert(tryKill(this, x, y+1, z));
+			//c.insert(tryKill(this, x, y-1, z));
+			//c.insert(tryKill(this, x, y, z+1));
+			//c.insert(tryKill(this, x, y, z-1));
+
+			std::set<Chunk*>::iterator it = c.begin();
+			for(it; it != c.end(); ++it) 
+				(*it)->update();
+		}
+	}
+}
+
+
+Chunk::explosion::explosion(Vector3 pos)
+{
+	node = Game::getPtr()->getGfx()->getSceneManager()->createSceneNode();
+	Game::getPtr()->getGfx()->getSceneManager()->getRootSceneNode()->addChild(node);
+	ent = Game::getPtr()->getGfx()->getSceneManager()->createEntity("Debris11.mesh");
+	node->attachObject(ent);
+	ent->setMaterialName("boom");
+	node->setPosition(pos);
+	life = 0.2f;
+}
+bool Chunk::explosion::update(Real delta)
+{
+	delay -= delta;
+	if(delay < 0.f)
+	{
+		life -= delta;
+		if(life <= 0.f)
+		{
+			node->setVisible(false);
+			return true;
+		}
+		else
+		{
+			node->setScale(Vector3(1,1,1) * (0.4-life)/0.2);
+		}
+	}
+	return false;
+}
+void Chunk::explosion::reac(Vector3 pos, Real dela)
+{
+	node->setPosition(pos);
+	node->setVisible(true);
+	node->setScale(Vector3(1,1,1));
+	delay = dela;
+	life = 0.2f;
+}
+Chunk::explosion::~explosion()
+{
+	node->getCreator()->destroyEntity(ent);
+	node->getCreator()->destroySceneNode(node);
 }

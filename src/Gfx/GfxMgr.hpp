@@ -44,6 +44,10 @@ public:
 
 	void removeGfxObject(GfxObject* obj);
 
+	void screenshot();
+
+	int numShots;
+
 //private: screw encapsulation I'm lazy...
 
     Ogre::Root* mRoot;

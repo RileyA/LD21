@@ -9,7 +9,7 @@ GfxMgr::GfxMgr()
     mWindow(0),
     mInitialized(false)
 {
-
+	numShots = 0;
 }
 //---------------------------------------------------------------------------
 
@@ -22,8 +22,8 @@ GfxMgr::~GfxMgr()
 void GfxMgr::init()
 {
 	// you didn't see anything...
-	mWidth = 800;
-	mHeight = 600;
+	mWidth = 1200;
+	mHeight = 800;
 	init(mWidth, mHeight, false, false);
 	mOyster = new Oyster::Oyster(mWidth,mHeight);
 }
@@ -100,10 +100,6 @@ void GfxMgr::deinit()
     if(mInitialized)
     {
 		endState();
-		for(int i = 0; i < mGuis.size(); ++i)
-			delete mGuis[i];
-		for(int i = 0; i < mObjs.size(); ++i)
-			delete mObjs[i];
 		delete mOyster;
         delete mRoot;
         mRoot = 0;
@@ -130,6 +126,12 @@ void GfxMgr::update(Real delta)
 
 void GfxMgr::endState()
 {
+	for(int i = 0; i < mObjs.size(); ++i)
+		delete mObjs[i];
+	for(int i = 0; i < mGuis.size(); ++i)
+		delete mGuis[i];
+	mGuis.clear();
+	mObjs.clear();
 	delete mOyster;
 	mOyster = new Oyster::Oyster(mWidth,mHeight);
 }
@@ -153,3 +155,10 @@ void GfxMgr::removeGfxObject(GfxObject* obj)
 		}
 	}
 }
+
+void GfxMgr::screenshot()
+{
+	++numShots;
+	mWindow->writeContentsToFile("LD21_"+StringUtils::toString(numShots)+".png");
+}
+

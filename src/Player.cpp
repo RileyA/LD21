@@ -1,5 +1,6 @@
 #include "Player.hpp"
 #include "Game.hpp"
+#include "Chunk.hpp"
 
 #define CROUCH_RATE 0.15f
 #define ROLL_RATE 0.35f
@@ -33,11 +34,22 @@ Player::Player()
 	leftrot = false;
 	skipFrame = 5;
 	backAngle = 0.f;
+	userdata* dat = new userdata;
+	dat->c = 0;
+	dat->type = 50000;
+	mSph->setUserData(dat);
+	mCap->setUserData(dat);
+	mCap2->setUserData(dat);
 }
 
 Player::~Player()
 { 
-
+	std::list<Shot*>::iterator it = mShots.begin();
+	for(it; it != mShots.end(); ++it)
+		delete *it;
+	it = mSpareShots.begin();
+	for(it; it != mSpareShots.end(); ++it)
+		delete *it;
 }
 
 // here be dragons
@@ -63,7 +75,7 @@ void Player::update(Real delta)
 	v *= speed;// * mGame->getInput()->isKeyDown("KC_UP");
 	Vector3 gravity = mCam->camPos->_getDerivedOrientation() * Vector3::NEGATIVE_UNIT_Y;
 	gravity.normalise();
-	v += gravity * (5-jumpFactor);
+	v += gravity * (5-jumpFactor) * 3;
 	mController->setVelocity(v);
 	if(mGame->getPtr()->getInput()->wasKeyPressed("KC_P"))
 		mController->setPosition(Vector3(0,0,0));
@@ -73,6 +85,22 @@ void Player::update(Real delta)
 		,norm, 0.93f, 0, COLLISION_GROUP_2);
 	
 	onGround = rr.hit && norm.angleBetween(-rr.normal) < Ogre::Radian(Ogre::Degree(2.f));
+
+	if(rr.hit)
+	{
+		userdata* d = static_cast<userdata*>(rr.userData);
+		if(d)
+		{
+			if(d->c)
+			{
+				int floor = d->c->getBlock(rr.hitP, rr.normal);
+			}
+			else if(d->type)
+			{
+				// maybe kill it...
+			}
+		}
+	}
 
 	crouchTime -= delta; 
 	if(crouchTime < 0.f)
@@ -210,7 +238,7 @@ void Player::update(Real delta)
 	mCam->camPos2->setPosition(verticalOffset);
 
 	if(mGame->getPtr()->getInput()->isKeyDown("KC_W") && onGround && jumpFactor < 5.f)
-		jumpFactor = 14.f;
+		jumpFactor = 10.45f;
 
 	if(mGame->getPtr()->getInput()->wasKeyPressed("KC_A") && !rotating)
 	{
@@ -277,4 +305,95 @@ void Player::update(Real delta)
 			mCam->camRoll->yaw(-Ogre::Degree(delta * 1080));
 		}
 	}
+	
+
+	if(mGame->getPtr()->getInput()->wasButtonPressed("MB_Left"))
+		shoot();
+
+	updateShots(delta);
+
 }
+
+void Player::shoot()
+{
+	Shot* s = 0;
+
+	if(!mSpareShots.empty())
+	{
+		s = mSpareShots.front();
+		mSpareShots.pop_front();
+	}
+	else
+	{
+		s = new Shot();
+		s->node = mGame->getGfx()->getSceneManager()->getRootSceneNode()->createChildSceneNode();
+		s->entity = mGame->getGfx()->getSceneManager()->createEntity("Debris8.mesh");
+		s->node->attachObject(s->entity);
+	}
+
+	mShots.push_back(s);
+	s->node->setVisible(true);
+	s->node->setPosition(mCam->mCamera->getDerivedPosition() + mCam->mCamera->getDerivedDirection());
+	s->direction = mCam->mCamera->getDerivedDirection();
+	s->done = false;
+	s->timeout = 3.f;
+	s->node->setScale(0.1f, 0.1f, 0.1f);
+}
+
+void Player::updateShots(Real delta)
+{
+	std::list<Shot*>::iterator it = mShots.begin();
+	for(it; it != mShots.end(); ++it)
+	{
+		Shot* s = (*it);
+
+		(*it)->timeout -= delta;
+
+
+		if((*it)->done)
+		{
+			s->node->setScale((s->timeout*5.f) * Vector3(0.1f, 0.1f, 0.1f));
+		}
+
+		if((*it)->timeout < 0.f)
+		{
+			it = mShots.erase(it);
+			mSpareShots.push_back(s);
+			s->node->setVisible(false);
+		}
+		else if(!s->done)
+		{
+			// raycast
+			RaycastReport rr = mGame->getPhysics()->raycastSimple((*it)->node->getPosition(), 
+				(*it)->direction, 30 * delta, 0, COLLISION_GROUP_2);
+
+			// if we hit, do somethin'
+			if(rr.hit)
+			{
+				s->done = true;
+				s->timeout = 0.6f;
+				s->node->setPosition(rr.hitP);
+				userdata* d = static_cast<userdata*>(rr.userData);
+
+				if(d)
+				{
+					if(d->c)
+						d->c->shootBlock(rr.hitP, rr.normal);
+				}
+
+				// get what we hit...
+				//if(rr.)
+				//{
+					
+				//}
+
+				// change color or something
+			}
+			else
+			{
+				s->node->translate(s->direction * delta * 30);
+			}
+		}
+	}
+}
+

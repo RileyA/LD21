@@ -91,7 +91,11 @@ public:
 	void deinit();
 	void update(Real delta);
 
-	void endState(){};
+	void endState()
+	{
+		deinit();
+		init();
+	};
 
 
 	Trimesh createStaticTrimesh(const MeshData& d, Ogre::Vector3 pos);

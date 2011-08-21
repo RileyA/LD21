@@ -13,6 +13,13 @@
 using Ogre::Vector2;
 using Ogre::Vector3;
 
+class Chunk;
+struct userdata
+{
+	Chunk* c;
+	int type;
+};
+
 /** A physics object (either a static or a rigid body)
 	this class functions as a wrapper for bullet functions 
 	and does automatic interpolation. */

@@ -1,6 +1,7 @@
 #include "StdHeaders.hpp"
 #include "OISListener.hpp"
 #include "InputMgr.hpp"
+#include "Game.hpp"
 
 OISListener::OISListener(size_t handle,InputMgr* sys,bool grabMouse)
 {
@@ -33,8 +34,8 @@ OISListener::OISListener(size_t handle,InputMgr* sys,bool grabMouse)
 	mKeyboard->setEventCallback(this);
 	mMouse->setEventCallback(this);
 	const OIS::MouseState &ms = mMouse->getMouseState();
-	ms.width = 800;
-	ms.height = 600;
+	ms.width = Game::getPtr()->getGfx()->getWindow()->getWidth();
+	ms.height = Game::getPtr()->getGfx()->getWindow()->getHeight();
 	setMousePosition(ms.width/2,ms.height/2);
 }
 //-----------------------------------------------------------------------
