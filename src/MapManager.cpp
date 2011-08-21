@@ -115,7 +115,7 @@ void MapManager::update(Real delta)
 		mChunks.front()->update();
 	}*/
 
-	std::cout<<"debz: "<<mDebris.size()<<"\n";
+	//std::cout<<"debz: "<<mDebris.size()<<"\n";
 	for(std::list<Debris*>::iterator it = mDebris.begin(); it != mDebris.end(); ++it)
 	{
 		if((*it)->delay > 0.f)
