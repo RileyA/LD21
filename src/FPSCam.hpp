@@ -27,6 +27,8 @@ public:
 	Ogre::SceneManager* mSmgr;
 	bool invert;
 
+	bool lock;
+
 };
 
 #endif

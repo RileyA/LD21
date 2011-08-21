@@ -58,7 +58,9 @@ Player::Player()
 	camTurn = false;
 	camReturn = false;
 	camWait = false;
-	wait = 2.8f;
+	wait = 3.2f;
+
+	mCam->lock = true;
 
 	fov = mCam->mCamera->getFOVy();
 }
@@ -82,7 +84,7 @@ void Player::update(Real delta)
 	--skipFrame;
 	if(skipFrame > 0)
 	{
-		mController->setPosition(Vector3(0,-1,-32));
+		mController->setPosition(Vector3(0,-1,-40));
 		return;
 	}
 
@@ -127,6 +129,7 @@ void Player::update(Real delta)
 				startSeq = false;
 				mCam->mCamera->setFOVy(fov);
 				mGame->getGfx()->setupViewp();
+				mCam->lock = false;
 			}
 			else if(backAngle > 0.f)
 			{

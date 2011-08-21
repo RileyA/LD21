@@ -24,6 +24,7 @@ FPSCam::FPSCam(Ogre::Camera* c)
 	pitch = 0.f;
 	cameraMotion = false;
 	invert = false;
+	lock = false;
 
 	mGame->getInput()->getSignal("mouseMoved")->addListener(
 		createSlot("look", this, &FPSCam::look));
@@ -60,6 +61,8 @@ void FPSCam::update(Real delta)
 
 void FPSCam::look(const Message& m)
 {	
+	if(lock)
+		return;
 	const Vector2* v = unpackMsg<Vector2>(m);
 	if(v->x * -0.35f > 5.f)
 		camYaw->yaw(Ogre::Radian(Ogre::Degree(5.f)));

@@ -23,8 +23,8 @@ GfxMgr::~GfxMgr()
 void GfxMgr::init()
 {
 	// you didn't see anything...
-	mWidth = 1024;
-	mHeight = 768;
+	mWidth = 800;
+	mHeight = 600;
 	init(mWidth, mHeight, false, false);
 	mOyster = new Oyster::Oyster(mWidth,mHeight);
 }
@@ -39,7 +39,7 @@ void GfxMgr::init(uint resX,uint resY,bool vsync,bool fullscreen)
 		//Ogre::RenderSystem* rs = mRoot->getRenderSystemByName(
         //    "Direct3D9 Rendering Subsystem");
 
-		/*Ogre::RenderSystem* rs = mRoot->getRenderSystemByName(
+		Ogre::RenderSystem* rs = mRoot->getRenderSystemByName(
             "OpenGL Rendering Subsystem");
 		mRoot->setRenderSystem(rs);
 
@@ -51,22 +51,17 @@ void GfxMgr::init(uint resX,uint resY,bool vsync,bool fullscreen)
 			miscP["vsync"] = "true";
 		else
 			miscP["vsync"] = "false";
-		miscP["FSAA"] = "4";
+		miscP["FSAA"] = "0";
 		miscP["gamma"] = "false";
 		miscP["border"] = "fixed";
 		miscP["colourDepth"] = "32";
-		miscP["monitorIndex"] = "0";*/
-	
-		if(!mRoot->showConfigDialog())	
-			throw std::runtime_error("ohno");// ... 
+		miscP["monitorIndex"] = "0";
 
-		mWindow = mRoot->initialise(true);
+		mWindow = mRoot->createRenderWindow(
+                "... - Ludum Dare 21 Entry - Copyright Riley Adams 2011",
+                resX,resY,fullscreen,&miscP);
 
-		//mWindow = mRoot->createRenderWindow(
-         //       "Fragmentation - Ludum Dare 21 Entry - Riley Adams",
-           //     resX,resY,fullscreen,&miscP);
-
-        //mWindow->setActive(true);
+        mWindow->setActive(true);
 
         mSmgr = mRoot->createSceneManager(Ogre::ST_GENERIC,"mSceneManager");
         mCamera = mSmgr->createCamera("mCamera");
