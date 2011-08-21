@@ -19,6 +19,7 @@ public:
 	Ogre::SceneNode* camYaw;
 	Ogre::SceneNode* camPitch;
 	Ogre::SceneNode* camPos;
+	Ogre::SceneNode* camPos2;
 	Real pichLimit;
 	Real pitch;
 	bool cameraMotion;

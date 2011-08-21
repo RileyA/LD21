@@ -28,6 +28,20 @@ void MapManager::update(Real delta)
 void MapManager::gen(int d)
 {
 	// TODO: cleanup old chunks
+	
+	if(!mChunks.empty())
+	{
+		Chunk* c = mChunks.front();
+		while(c && ((c->obj->getNode()->getPosition().z - 15.5)/-32.f) < gennedTo - 5)
+		{
+			mChunks.pop_front();
+			Chunk* cc = c;
+			c = c->next;
+			cc->kill();
+			delete cc;
+		}
+	}
+
 	while(gennedTo < d + genTo)
 	{
 		if(mChunks.size())

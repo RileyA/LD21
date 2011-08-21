@@ -15,6 +15,21 @@ public:
 
 	FPSCam* mCam;
 	PhysicsObject* mController;
+	PhysicsObject* mCap;
+	PhysicsObject* mCap2;
+	PhysicsObject* mSph;
+
+	Real jumpFactor;
+	bool onGround;
+
+	bool crouching;
+	bool crouched;
+	Real crouchTime;
+
+	Vector3 offset;
+	bool rotating;
+	Real rotation;
+	bool leftrot; 
 
 };
 

@@ -27,6 +27,7 @@ public:
 	/** Returns a pointer the bullet rigid body 
 		\returns a pointer to the bullet rigid body */
 	btRigidBody* getActor();
+	btCollisionObject* getCObj(){return mActor;}
 
 	/** Sets the object's position
 		\param pos the desired position */

@@ -16,6 +16,8 @@ public:
 	Chunk(Vector3 pos);
 	virtual ~Chunk();
 
+	void kill();
+
 	void build();
 
 	void setPosition(Vector3 p);

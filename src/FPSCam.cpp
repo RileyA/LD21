@@ -10,9 +10,11 @@ FPSCam::FPSCam(Ogre::Camera* c)
 	camYaw = mSmgr->createSceneNode();
 	camPitch = mSmgr->createSceneNode();
 	camPos = mSmgr->createSceneNode();
+	camPos2 = mSmgr->createSceneNode();
 
 	mSmgr->getRootSceneNode()->addChild(camPos);
-	camPos->addChild(camYaw);
+	camPos->addChild(camPos2);
+	camPos2->addChild(camYaw);
 	camYaw->addChild(camPitch);
 	camPitch->addChild(camRoll);
 	camRoll->attachObject(mCamera);
@@ -28,10 +30,12 @@ FPSCam::FPSCam(Ogre::Camera* c)
 FPSCam::~FPSCam()
 {
 	camPos->removeAllChildren();
+	camPos2->removeAllChildren();
 	camRoll->removeAllChildren();
 	camPitch->removeAllChildren();
 	camYaw->removeAllChildren();
 	mSmgr->destroySceneNode(camPos);
+	mSmgr->destroySceneNode(camPos2);
 	mSmgr->destroySceneNode(camRoll);
 	mSmgr->destroySceneNode(camPitch);
 	mSmgr->destroySceneNode(camYaw);

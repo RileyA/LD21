@@ -40,6 +40,8 @@ void MenuState::init()
 
 	player = new Player();
 
+	mGfx->getSceneManager()->setFog(Ogre::FOG_LINEAR,Ogre::ColourValue(0,0,0),
+		0.f,15.f,75.f);
 }
 
 void MenuState::deinit()

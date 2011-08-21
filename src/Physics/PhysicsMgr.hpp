@@ -29,6 +29,28 @@ enum CollisionTypes
 	COLLISION_GROUP_15 = BIT(15)
 };
 
+struct	OverlapResultCallback : public btCollisionWorld::ContactResultCallback
+{
+	unsigned int hits;
+
+	OverlapResultCallback()
+	{
+		hits = 0;
+		m_collisionFilterGroup = COLLISION_GROUP_1;
+		m_collisionFilterMask = COLLISION_GROUP_1;
+	}
+
+	virtual	btScalar addSingleResult(btManifoldPoint& cp,const btCollisionObject* colObj0,
+		int partId0,int index0,const btCollisionObject* colObj1,int partId1,int index1)
+	{
+		if(cp.getDistance()<=0)
+		{
+			++hits;
+		}
+		return 0.f;
+	}
+};
+
 struct Trimesh
 {
 	btCollisionObject* actor;
@@ -96,6 +118,8 @@ public:
 	void setGravity(Ogre::Vector3 grav);
 
 	RaycastReport raycastSimple(Ogre::Vector3 pos,Ogre::Vector3 dir,Real dist=10000.f,short group=0,short mask=0);
+
+	bool overlap(PhysicsObject* obj, Vector3 p, Ogre::Quaternion q = Ogre::Quaternion::IDENTITY);
 
 protected:
 

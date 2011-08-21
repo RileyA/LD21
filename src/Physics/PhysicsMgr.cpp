@@ -230,7 +230,7 @@ PhysicsObject* PhysicsMgr::createCapsule(float radius, float height,Ogre::Vector
 	actor->setWorldTransform(btTransform(btQuaternion::getIdentity(),btVector3(pos.x,pos.y,pos.z)));
 
 	//dynamic_cast<btDiscreteDynamicsWorld*>(mDynamicsWorld)->addRigidBody(actor,COLLISION_GROUP_2,COLLISION_GROUP_2|COLLISION_GROUP_3|COLLISION_GROUP_1);
-	dynamic_cast<btDiscreteDynamicsWorld*>(mDynamicsWorld)->addRigidBody(actor,COLLISION_GROUP_1,COLLISION_GROUP_1); //if I need collision filtering..
+	dynamic_cast<btDiscreteDynamicsWorld*>(mDynamicsWorld)->addRigidBody(actor,COLLISION_GROUP_2,COLLISION_GROUP_1); //if I need collision filtering..
 
 	mObjects.push_back(new PhysicsObject(actor,mDynamicsWorld));
 
@@ -472,3 +472,18 @@ void Trimesh::kill()
 	delete shape;
 	delete mesh;
 }
+
+
+bool PhysicsMgr::overlap(PhysicsObject* obj, Vector3 pos, Ogre::Quaternion q)
+{
+	Vector3 oldPos = obj->getPosition();
+	Ogre::Quaternion oldQ = obj->getOrientation();
+	OverlapResultCallback overlapCall;
+	obj->setPosition(pos);
+	obj->setOrientation(q);
+	mDynamicsWorld->contactTest(obj->getCObj(),overlapCall);
+	obj->setPosition(oldPos);
+	obj->setOrientation(oldQ);
+	return overlapCall.hits > 1;
+}
+

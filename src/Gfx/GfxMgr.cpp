@@ -74,7 +74,8 @@ void GfxMgr::init(uint resX,uint resY,bool vsync,bool fullscreen)
 
 
         mViewport = mWindow->addViewport(mCamera);
-		mViewport->setBackgroundColour(Ogre::ColourValue(44.f/455.f,90.f/455.f,93.f/455.f));
+		//mViewport->setBackgroundColour(Ogre::ColourValue(44.f/455.f,90.f/455.f,93.f/455.f));
+		mViewport->setBackgroundColour(Ogre::ColourValue(0,0,0));
         mCamera->setAspectRatio(Ogre::Real(mViewport->getActualWidth())
                                 / Ogre::Real(mViewport->getActualHeight()));
 

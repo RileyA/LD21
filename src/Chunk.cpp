@@ -136,12 +136,12 @@ bool getCube(Chunk* c, int i, int j, int k, int d1, int8 d2)
 	if(k < 0)
 	{
 		k += 32;
-		c = c->prev;
+		c = c->next;
 	}
 	else if(k > 31)
 	{
 		k -= 32;
-		c = c->next;
+		c = c->prev;
 	}
 
 	if(!c)
@@ -163,12 +163,12 @@ bool getCube(Chunk* c, int i, int j, int k, int8 d1)
 	if(k < 0)
 	{
 		k += 32;
-		c = c->prev;
+		c = c->next;
 	}
 	else if(k > 31)
 	{
 		k -= 32;
-		c = c->next;
+		c = c->prev;
 	}
 
 	if(!c)
@@ -186,12 +186,12 @@ bool getCube(Chunk* c, int i, int j, int k)
 	if(k < 0)
 	{
 		k += 32;
-		c = c->prev;
+		c = c->next;
 	}
 	else if(k > 31)
 	{
 		k -= 32;
-		c = c->next;
+		c = c->prev;
 	}
 
 	if(!c)
@@ -275,4 +275,9 @@ void Chunk::build()
 	
 	obj->load(d); 
 	tm = Game::getPtr()->getPhysics()->createStaticTrimesh(d, obj->getNode()->getPosition());
+}
+
+void Chunk::kill()
+{
+	tm.kill();
 }
