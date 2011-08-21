@@ -214,10 +214,11 @@ bool getCube(Chunk* c, int i, int j, int k)
 		{d = 2.5f;}\
 	else\
 		{d = 1.f + (lts[0] + lts[1] + lts[2]) * 0.5f;}\
-	m.diffuse.push_back(1.f/d);\
-	m.diffuse.push_back(1.f/d);\
-	m.diffuse.push_back(1.f/d);\
-	m.diffuse.push_back(1.f/d);\
+	d*=0.75;\
+	m.diffuse.push_back(1.f);\
+	m.diffuse.push_back(1.f);\
+	m.diffuse.push_back(1.f);\
+	m.diffuse.push_back(1.f);\
 
 void makeQuad(MeshData& m, int direction, byte x, byte y, byte z, byte t, Chunk* c)
 {

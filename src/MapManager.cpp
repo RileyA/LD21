@@ -115,6 +115,7 @@ void MapManager::update(Real delta)
 		mChunks.front()->update();
 	}*/
 
+	std::cout<<"debz: "<<mDebris.size()<<"\n";
 	for(std::list<Debris*>::iterator it = mDebris.begin(); it != mDebris.end(); ++it)
 	{
 		if((*it)->delay > 0.f)
@@ -235,7 +236,7 @@ void MapManager::makeDebris(Chunk* c, int type, int i, int j, int k)
 	d->delay = Rand::randFloat(0.f,0.375f);
 	d->entity->setMaterialName("atlas_" + StringUtils::toString(type));
 	d->node->setPosition(c->obj->getNode()->getPosition() + Vector3(i,j,k));
-	d->life = 2.5f;
+	d->life = 0.5f;
 }
 
 void MapManager::makeDebrisEx(Chunk* c, int type, int i, int j, int k)
@@ -268,6 +269,6 @@ void MapManager::makeDebrisEx(Chunk* c, int type, int i, int j, int k)
 	d->changedCourse = true;
 	d->dist = 5.f;
 	d->entity->setMaterialName("atlas_" + StringUtils::toString(type));
-	d->life = Rand::randFloat(2.f,3.75f);
+	d->life = Rand::randFloat(0.5f,1.25f);
 	d->delay = Rand::randFloat(0.f,0.375f);
 }
