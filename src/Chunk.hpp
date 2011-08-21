@@ -20,6 +20,8 @@ public:
 
 	void build();
 
+	void update();
+
 	void setPosition(Vector3 p);
 
 	Chunk* next;

@@ -22,6 +22,7 @@ FPSCam::FPSCam(Ogre::Camera* c)
 	pichLimit = 80.f;
 	pitch = 0.f;
 	cameraMotion = false;
+	invert = false;
 
 	mGame->getInput()->getSignal("mouseMoved")->addListener(
 		createSlot("look", this, &FPSCam::look));
@@ -61,7 +62,7 @@ void FPSCam::look(const Message& m)
 	const Vector2* v = unpackMsg<Vector2>(m);
 	camYaw->yaw(Ogre::Radian(Ogre::Degree(v->x*-0.35f)));
 
-	Real tryPitch = v->y*-0.35f;
+	Real tryPitch = v->y*-0.35f * (1 - 2 * invert);
 	Real actualPitch = tryPitch;
 
 	if(pitch + tryPitch > 80.f)

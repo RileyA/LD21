@@ -223,13 +223,12 @@ void makeQuad(MeshData& m, int direction, byte x, byte y, byte z, byte t, Chunk*
 {
 	bool lts[3];
 	float d;
-	int atlas = t;
-	VERT(0,atlas)
-	VERT(1,atlas)
-	VERT(2,atlas)
-	VERT(0,atlas)
-	VERT(3,atlas)
-	VERT(1,atlas)
+	VERT(0,t)
+	VERT(1,t)
+	VERT(2,t)
+	VERT(0,t)
+	VERT(3,t)
+	VERT(1,t)
 }
 
 Chunk::Chunk(Vector3 pos)
@@ -280,4 +279,42 @@ void Chunk::build()
 void Chunk::kill()
 {
 	tm.kill();
+}
+
+void Chunk::update()
+{
+	tm.kill();
+	obj->unload();
+	
+	d.vertices.clear();
+	d.texcoords[0].clear();
+	d.diffuse.clear();
+
+	for(int i = 0; i < WIDTH; ++i)
+		for(int j = 0; j < HEIGHT; ++j)
+			for(int k = 0; k < DEPTH; ++k)
+	{
+		if(data[i][j][k])
+			continue;
+
+		if(i < WIDTH-1 && data[i+1][j][k])
+			makeQuad(d, 1, i, j, k, data[i+1][j][k], this);
+		if(i > 0 && data[i-1][j][k])
+			makeQuad(d, 0, i, j, k, data[i-1][j][k], this);
+		if(j < HEIGHT-1 && data[i][j+1][k])
+			makeQuad(d, 3, i, j, k, data[i][j+1][k], this);
+		if(j > 0 && data[i][j-1][k])
+			makeQuad(d, 2, i, j, k, data[i][j-1][k], this);
+		if(k < DEPTH-1 && data[i][j][k+1])
+			makeQuad(d, 5, i, j, k, data[i][j][k+1], this);
+		if(k > 0 && data[i][j][k-1])
+			makeQuad(d, 4, i, j, k, data[i][j][k-1], this);
+		if(k == 0 && next && next->data[i][j][DEPTH-1])
+			makeQuad(d, 4, i, j, k, next->data[i][j][DEPTH-1], this);
+		if(k == DEPTH-1 && prev && prev->data[i][j][0])
+			makeQuad(d, 5, i, j, k, prev->data[i][j][0], this);
+	}
+		
+	obj->load(d); 
+	tm = Game::getPtr()->getPhysics()->createStaticTrimesh(d, obj->getNode()->getPosition());
 }

@@ -12,6 +12,7 @@
 #include <deque>
 #include <list>
 #include <assert.h>
+#include <cstdlib>
 
 // some random typedefs
 typedef std::string String;
@@ -27,6 +28,15 @@ public:
 		std::stringstream ss;
 		ss<<v;
 		return ss.str();
+	}
+};
+
+class Rand
+{
+public:
+	static float randFloat(float min_, float max_)
+	{
+		return rand()/(1.f + RAND_MAX) * (max_ - min_) + min_;
 	}
 };
 

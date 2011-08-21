@@ -33,6 +33,8 @@ public:
 
 	int skipFrame;
 
+	Real backAngle;
+
 };
 
 #endif

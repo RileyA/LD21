@@ -32,6 +32,7 @@ Player::Player()
 	rotation = 0.f;
 	leftrot = false;
 	skipFrame = 5;
+	backAngle = 0.f;
 }
 
 Player::~Player()
@@ -54,12 +55,12 @@ void Player::update(Real delta)
 		jumpFactor = 0.f;
 
 	Real speed = 10.f;
-	Vector3 v = (mGame->getGfx()->mCamera->getDerivedDirection());
+	Vector3 v = (mGame->getGfx()->mCamera->getParentSceneNode()->getParentSceneNode()->_getDerivedOrientation()) * Vector3::NEGATIVE_UNIT_Z;
 
 	Ogre::Plane pln(mCam->camPos->_getDerivedOrientation() * Vector3::UNIT_Y, 0);	
 	v = pln.projectVector(v);
 	v.normalise();
-	v *= speed;// * mGame->getInput()->isKeyDown("KC_Q");
+	v *= speed;// * mGame->getInput()->isKeyDown("KC_UP");
 	Vector3 gravity = mCam->camPos->_getDerivedOrientation() * Vector3::NEGATIVE_UNIT_Y;
 	gravity.normalise();
 	v += gravity * (5-jumpFactor);
@@ -73,7 +74,7 @@ void Player::update(Real delta)
 	
 	onGround = rr.hit && norm.angleBetween(-rr.normal) < Ogre::Radian(Ogre::Degree(2.f));
 
-	crouchTime -= delta;
+	crouchTime -= delta; 
 	if(crouchTime < 0.f)
 		crouchTime = 0.f;
 
@@ -244,5 +245,36 @@ void Player::update(Real delta)
 		crouching = true;
 		crouchTime = 0.1f;
 	}
- 
+
+	if(mGame->getInput()->isButtonDown("MB_Right"))
+	{
+		mCam->invert = true;
+		if(backAngle + delta*1080.f >= 180.f)
+		{
+			Real a = 180.f - backAngle;
+			mCam->camRoll->yaw(Ogre::Degree(a));
+			backAngle = 180.f;
+		}
+		else if(backAngle < 180.f)
+		{
+			backAngle += delta * 1080;
+			mCam->camRoll->yaw(Ogre::Degree(delta * 1080));
+		}
+	}
+	else
+	{
+		mCam->invert = false;
+		if(backAngle - delta*1080.f <= 0.f)
+		{
+			Real a = 180.f - backAngle;
+			mCam->camRoll->yaw(-Ogre::Degree(backAngle));
+			mCam->camRoll->setOrientation(Ogre::Quaternion::IDENTITY);
+			backAngle = 0.f;
+		}
+		else if(backAngle > 0.f)
+		{
+			backAngle -= delta * 1080;
+			mCam->camRoll->yaw(-Ogre::Degree(delta * 1080));
+		}
+	}
 }

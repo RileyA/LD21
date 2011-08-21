@@ -50,7 +50,7 @@ void GfxMgr::init(uint resX,uint resY,bool vsync,bool fullscreen)
 			miscP["vsync"] = "true";
 		else
 			miscP["vsync"] = "false";
-		miscP["FSAA"] = "0";
+		miscP["FSAA"] = "4";
 		miscP["gamma"] = "false";
 		miscP["border"] = "fixed";
 		miscP["colourDepth"] = "32";

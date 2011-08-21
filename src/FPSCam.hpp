@@ -25,6 +25,7 @@ public:
 	bool cameraMotion;
     Ogre::Camera* mCamera;
 	Ogre::SceneManager* mSmgr;
+	bool invert;
 
 };
 

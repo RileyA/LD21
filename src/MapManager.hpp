@@ -22,6 +22,27 @@ public:
 	int buildTo;
 	int gennedTo; 
 
+	Real destruction;
+
+	struct Debris
+	{
+		Ogre::SceneNode* node;
+		Ogre::Entity* entity;
+		Vector3 dir;
+		Real dist;
+		bool changedCourse;
+		Real life;
+		Real delay;
+	};
+
+	void makeDebris(Chunk* c, int type, int i, int j, int k);
+	void makeDebrisEx(Chunk* c, int type, int i, int j, int k);
+
+	std::list<Debris*> mDebris;
+	std::list<Debris*> mSpareDebris;
+
+	Real delay;
+
 };
 
 #endif
