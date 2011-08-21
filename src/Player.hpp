@@ -38,9 +38,24 @@ public:
 
 	int skipFrame;
 
+
+	bool startSeq;
+	bool camTurn;
+	bool camWait;
+	Real wait;
+	Real camReturn;
+
+	Ogre::Radian fov;
+
 	Real slowtimer;
 
 	Real backAngle;
+
+	Real spt;
+	Real cht;
+	Real cht2;
+
+	Real startTimer;
 
 	std::list<float> spds; 
 	std::list<Vector3> cp; 

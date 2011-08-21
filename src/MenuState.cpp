@@ -33,16 +33,22 @@ void MenuState::init()
 
 	mGame->getInput()->initInput(handle,true);
 	//...
-	mOyster->createAtlas("Test", "TechDemo.oyster");
-	Oyster::Batch* b = mOyster->createBatch("Test", "Test");
 	//b->createLayer(1)->createRectangle(0, 0, 50, 50)->setSprite("logo");
-	dist = b->createLayer(1)->createText("Distance: Not Much", 10, 10, 500, 500);
 
 	int w = mGfx->getWindow()->getWidth();
 	int h = mGfx->getWindow()->getHeight();
 
+	mOyster->createAtlas("Test", "TechDemo.oyster");
+	Oyster::Batch* b = mOyster->createBatch("Test", "Test");
+	dist = b->createLayer(1)->createText("Distance: Not Much", 10, 10, 500, 500);
+	//b->createLayer(1)->createRectangle((w-47)/2,(h-47)/2,47,47)->setSprite("reticle");
 	b->getLayer(1)->createRectangle((w-47)/2,(h-47)/2,47,47)->setSprite("reticle");
 	mGfx->createGui(b);
+
+	mOyster->createAtlas("Test2", "TechDemo.oyster");
+	b = mOyster->createBatch("Test2", "Test");
+	mGfx->createGui(b);
+	b->createLayer(1);
 
 	for(int i = 0; i < 20; ++i)
 	{
@@ -59,7 +65,6 @@ void MenuState::init()
 			rects[i]->setColor(100,100,100,150);
 	}
 
-	b->getLayer(1)->createRectangle((w-47)/2,(h-47)/2,47,47)->setSprite("reticle");
 
 	mm = new MapManager(mGfx->mCamera);
 
@@ -68,7 +73,7 @@ void MenuState::init()
 		0.03f,15.f,75.f);
 	maxDist = 0.f;
 
-	mGfx->setupViewp();
+	text = true;
 
 }
 
@@ -83,9 +88,9 @@ void MenuState::update(Real delta)
 	if(d > maxDist)
 	{
 		maxDist = d;
-		//dist->setCaption("Distance: "+StringUtils::toString(maxDist) + "m");
+		dist->setCaption("Distance: "+StringUtils::toString(maxDist) + "m");
+		dist->setColor(255,255,255,255);
 	}
-
 	for(int i = 0; i < 20; ++i)
 	{
 		if(player->speedp >= i)
@@ -93,6 +98,8 @@ void MenuState::update(Real delta)
 		else
 			rects[i]->setColor(100,100,100,150);
 	}
+
+	text = !text;
 	
 	if(fabs(mGfx->mCamera->getDerivedPosition().x) > 7.75f ||
 		fabs(mGfx->mCamera->getDerivedPosition().y) > 7.75f ||

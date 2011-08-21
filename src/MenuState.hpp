@@ -30,6 +30,7 @@ protected:
 	int maxDist;
 	MapManager* mm;
 	Oyster::Rectangle* rects[20];
+	bool text;
 
 };
 

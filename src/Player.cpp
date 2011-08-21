@@ -7,7 +7,7 @@
 
 Player::Player()
 {
-	mCap = Game::getPtr()->getPhysics()->createCapsule(0.4f, 1.f, Vector3(0,0,0));
+	mCap = Game::getPtr()->getPhysics()->createCapsule(0.4f, 1.f, Vector3(0,-2,-50));
 	mCap2 = Game::getPtr()->getPhysics()->createCapsule(0.36f, 1.f, Vector3(0,0,0));
 	mSph = Game::getPtr()->getPhysics()->createSphere(0.4f, Vector3(0,10000,0));
 
@@ -19,6 +19,8 @@ Player::Player()
 	mCap2->setAngularFactor(Vector3(0,0,0));
 	mCap2->setPosition(Vector3(0,100,0));
 	//mCap2->setSleepingEnabled(true);
+
+	// this just gross, this is what sleep deprivation and changing plans does...
 
 	mController = mCap;
 	mCam = new FPSCam(Game::getPtr()->getGfx()->mCamera);
@@ -48,6 +50,17 @@ Player::Player()
 	speedp = 4;
 	speedprog = 0.f;
 	slowtimer = 0.1f;
+	spt = 3.f;
+	cht = 2.f;
+	cht2 = 1.5f;
+	startTimer = 0.f;
+	startSeq = true;
+	camTurn = false;
+	camReturn = false;
+	camWait = false;
+	wait = 2.8f;
+
+	fov = mCam->mCamera->getFOVy();
 }
 
 Player::~Player()
@@ -69,9 +82,62 @@ void Player::update(Real delta)
 	--skipFrame;
 	if(skipFrame > 0)
 	{
-		mController->setPosition(Vector3(0,0,0));
+		mController->setPosition(Vector3(0,-1,-32));
 		return;
 	}
+
+	if(startSeq)
+	{
+		Vector3 cpos = mController->getPosition();
+		mCam->camPos->setPosition(cpos + Vector3(0,0.7f,0));
+
+		if(!camTurn)
+		{
+			if(backAngle + delta*700.f >= 180.f)
+			{
+				Real a = 180.f - backAngle;
+				mCam->camRoll->yaw(Ogre::Degree(a));
+				backAngle = 180.f;
+				camTurn = true;
+			}
+			else if(backAngle < 180.f)
+			{
+				backAngle += delta * 700;
+				mCam->camRoll->yaw(Ogre::Degree(delta * 700));
+				mCam->mCamera->setFOVy(Ogre::Degree(mCam->mCamera->getFOVy()) - Ogre::Degree(delta * 50));
+			}
+		}
+		else if(!camWait)
+		{
+			wait -= delta;
+			if(wait < 0.f)
+			{
+				camWait = true;
+			}
+		}
+		else if(!camReturn)
+		{
+			if(backAngle - delta*450.f <= 0.f)
+			{
+				Real a = 180.f - backAngle;
+				mCam->camRoll->yaw(-Ogre::Degree(backAngle));
+				mCam->camRoll->setOrientation(Ogre::Quaternion::IDENTITY);
+				backAngle = 0.f;
+				camReturn = true;
+				startSeq = false;
+				mCam->mCamera->setFOVy(fov);
+				mGame->getGfx()->setupViewp();
+			}
+			else if(backAngle > 0.f)
+			{
+				backAngle -= delta * 450;
+				mCam->camRoll->yaw(-Ogre::Degree(delta * 450));
+				mCam->mCamera->setFOVy(Ogre::Degree(mCam->mCamera->getFOVy()) + Ogre::Degree(delta * 50));
+			}
+		}
+		return;
+	}
+
 	jumpFactor -= delta * 29;
 	if(jumpFactor < 0.f)
 		jumpFactor = 0.f;
@@ -92,6 +158,7 @@ void Player::update(Real delta)
 			--speedp;
 			slowtimer = 0.1f;
 			Game::getPtr()->getAudio()->play2D("media/audio/crash.wav");
+			spt = 2.f;
 		}
 	}
 	else
@@ -99,6 +166,38 @@ void Player::update(Real delta)
 		slowtimer += delta;
 		if(slowtimer > 0.1f)
 			slowtimer = 0.1f;
+	}
+
+	if(!crouched)
+		spt -= delta;
+	else
+	{
+		spt += delta / 3;
+		if(spt > 3.2f)
+			spt = 3.2f;
+	}
+
+	if(spt < 0.f && !crouched)
+	{
+		spt = 3.f;
+		Game::getPtr()->getAudio()->play2D("media/audio/upspeed.wav");
+		++speedp;
+	}
+
+	if(crouched)
+		cht -= delta;
+	else
+		cht += delta;
+
+	if(crouched && cht <= 0.f)
+	{
+		cht = 3.f;
+		--speedp;
+		Game::getPtr()->getAudio()->play2D("media/audio/lowerspeed.wav");
+	}
+	if(cht > 3.f)
+	{
+		cht = 3.f;
 	}
 
 	//std::cout<<spd<<"\n";
@@ -362,37 +461,6 @@ void Player::update(Real delta)
 		crouchTime = 0.1f;
 	}
 
-	/*if(mGame->getInput()->isKeyDown("KC_S"))
-	{
-		mCam->invert = true;
-		if(backAngle + delta*1500.f >= 180.f)
-		{
-			Real a = 180.f - backAngle;
-			mCam->camRoll->yaw(Ogre::Degree(a));
-			backAngle = 180.f;
-		}
-		else if(backAngle < 180.f)
-		{
-			backAngle += delta * 1500;
-			mCam->camRoll->yaw(Ogre::Degree(delta * 1500));
-		}
-	}
-	else
-	{
-		mCam->invert = false;
-		if(backAngle - delta*1500.f <= 0.f)
-		{
-			Real a = 180.f - backAngle;
-			mCam->camRoll->yaw(-Ogre::Degree(backAngle));
-			mCam->camRoll->setOrientation(Ogre::Quaternion::IDENTITY);
-			backAngle = 0.f;
-		}
-		else if(backAngle > 0.f)
-		{
-			backAngle -= delta * 1500;
-			mCam->camRoll->yaw(-Ogre::Degree(delta * 1500));
-		}
-	}*/
 	
 
 	//if(mGame->getPtr()->getInput()->wasKeyPressed("KC_W"))

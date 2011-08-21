@@ -10,9 +10,9 @@ MapManager::MapManager(Ogre::Camera* cam)
 	genTo = 5;
 	buildTo = 4;
 	gennedTo = 0;
-	destruction = 5.f;
+	destruction = 1.f;
 	delay = 1.f;
-	ds = 12.f;
+	ds = 13.f;
 }
 
 MapManager::~MapManager()
@@ -54,7 +54,7 @@ int8 getTrackBlock(int seed)
 		return 1;
 	else if(seed < 375)
 		return getNormalBlock();
-	else if(seed < 455)
+	else if(seed < 495)
 		return rand()%3 == 1 ? getNormalBlock() : 2;
 	else if(seed < 475)
 		return 4;
@@ -86,7 +86,9 @@ void MapManager::update(Real delta)
 	if(mGame->getGfx()->mCamera->getDerivedPosition().z - destruction <= -100)
 	{
 		destruction = mGame->getGfx()->mCamera->getDerivedPosition().z + 25;
-		ds += 0.5f;
+		ds += 2.f;
+		if(ds > 24.f)
+			ds = 24.f;
 	}
 
 	delay -=delta;
@@ -283,12 +285,34 @@ void MapManager::gen(int d)
 
 			if(obs <= 0 && gennedTo > 3)
 			{
-				obs = rand()%8+5;
-				int typ = rand()%4;
+				obs = rand()%8+6;
+				int typ = rand()%6;
 				// column
+				if(typ < 5)
 				{
 					int axis = rand()%2;
 					int spot = rand()%5 + 1;
+					if(axis)
+						for(int i = 1; i < 6; ++i)
+							ch->data[spot][i][k] = 1;
+					else
+						for(int i = 1; i < 6; ++i)
+							ch->data[i][spot][k] = 1;
+				}
+				// two column
+				else
+				{
+					int axis = rand()%2;
+					int spot = rand()%5 + 1;
+					if(axis)
+						for(int i = 1; i < 6; ++i)
+							ch->data[spot][i][k] = 1;
+					else
+						for(int i = 1; i < 6; ++i)
+							ch->data[i][spot][k] = 1;
+
+					axis = rand()%2;
+					spot = rand()%5 + 1;
 					if(axis)
 						for(int i = 1; i < 6; ++i)
 							ch->data[spot][i][k] = 1;

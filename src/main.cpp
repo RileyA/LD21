@@ -12,7 +12,15 @@ int main(int argc, char** argv)
 	g->addState(m);
 	//MenuState* mm = new MenuState();
 	//g->addState(mm);
-	g->go();
-	delete g;
+	try
+	{
+		g->go();
+		delete g;
+	}
+	catch(std::runtime_error e)
+	{
+		//....
+	}
+
 	return 0;
 };
