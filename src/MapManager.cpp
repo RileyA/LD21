@@ -34,7 +34,7 @@ void MapManager::update(Real delta)
 	if(delay < 0.f)
 	{
 		delay = 0.4f;
-	std::cout<<destruction<<"\n";
+	//std::cout<<destruction<<"\n";
 
 		// only do this every second or so
 		Chunk* c = mChunks.empty() ? 0 : mChunks.front();
@@ -47,7 +47,7 @@ void MapManager::update(Real delta)
 			if(destruction < c->obj->getNode()->getPosition().z + 16)
 			{
 				int dd = (c->obj->getNode()->getPosition().z + 16) - destruction;
-				std::cout<<dd<<"\n";
+				//std::cout<<dd<<"\n";
 				for(int i = 0; i < WIDTH; ++i)
 					for(int j = 0; j < HEIGHT; ++j)
 						for(int k = DEPTH - 1; k > 32 - dd && k >= 0; --k)
@@ -82,7 +82,7 @@ void MapManager::update(Real delta)
 				c->update();
 				c = c->next;
 			}
-			else if(destruction < c->obj->getNode()->getPosition().z - 16)
+			else if(destruction < c->obj->getNode()->getPosition().z - 10)
 			{
 				Chunk* cc = c;
 				c = c->next;
@@ -230,7 +230,7 @@ void MapManager::makeDebris(Chunk* c, int type, int i, int j, int k)
 	else if(j == 6)
 		d->dir = Vector3(0,1,0);
 
-	d->node->setVisible(true);
+	d->node->setVisible(false);
 	d->changedCourse = false;
 	d->dist = 0.f;
 	d->delay = Rand::randFloat(0.f,0.375f);
@@ -265,7 +265,7 @@ void MapManager::makeDebrisEx(Chunk* c, int type, int i, int j, int k)
 	d->dir.normalise();
 	d->dir *= Rand::randFloat(1.5f, 3.5f);
 
-	d->node->setVisible(true);
+	d->node->setVisible(false);
 	d->changedCourse = true;
 	d->dist = 5.f;
 	d->entity->setMaterialName("atlas_" + StringUtils::toString(type));
