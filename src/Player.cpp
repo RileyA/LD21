@@ -31,6 +31,7 @@ Player::Player()
 	rotating = false;
 	rotation = 0.f;
 	leftrot = false;
+	skipFrame = 5;
 }
 
 Player::~Player()
@@ -38,10 +39,16 @@ Player::~Player()
 
 }
 
-// here be dragons...
+// here be dragons
 void Player::update(Real delta)
 {
-
+	// wait a few frames so loading hiccups don't cause the controller to tunnel
+	--skipFrame;
+	if(skipFrame > 0)
+	{
+		mController->setPosition(Vector3(0,0,0));
+		return;
+	}
 	jumpFactor -= delta * 29;
 	if(jumpFactor < 0.f)
 		jumpFactor = 0.f;

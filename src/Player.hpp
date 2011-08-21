@@ -31,6 +31,8 @@ public:
 	Real rotation;
 	bool leftrot; 
 
+	int skipFrame;
+
 };
 
 #endif
