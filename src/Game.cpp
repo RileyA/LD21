@@ -21,6 +21,7 @@ Game::~Game()
 
 void Game::go()
 {
+	srand(time(0));
 	init();
 
 	while(!mStates.empty())

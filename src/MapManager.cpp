@@ -186,7 +186,7 @@ void MapManager::update(Real delta)
 			continue;
 		}
 		(*it)->node->translate((*it)->dir * delta * 1.5f);
-		(*it)->box->setPosition((*it)->node->getPosition());
+		//(*it)->box->setPosition((*it)->node->getPosition());
 		(*it)->dist += delta * 0.75f;
 		(*it)->life -= delta;
 		if((*it)->dist > 1.2f && !(*it)->changedCourse)
@@ -377,18 +377,18 @@ void MapManager::makeDebris(Chunk* c, int type, int i, int j, int k)
 		d->entity = mGame->getGfx()->getSceneManager()->createEntity("Debris" + StringUtils::toString(type)  + ".mesh");
 		d->type = type;
 		d->node->attachObject(d->entity);
-		d->box = mGame->getPhysics()->createCube(Vector3(0.5f,0.5f,0.5f), Vector3(0,0,0));
-		d->box->setKinematic(true);
+		//d->box = mGame->getPhysics()->createCube(Vector3(0.5f,0.5f,0.5f), Vector3(0,0,0));
+		//d->box->setKinematic(true);
 		d->dat = new userdata;
 		d->dat->c = 0;
 		d->dat->type = type;
-		d->box->setUserData(d->dat);
+		//d->box->setUserData(d->dat);
 	}
 
 	mDebris.push_back(d);
 	Vector3 p = c->obj->getNode()->getPosition() + Vector3(i,j,k);
 	d->node->setPosition(p);
-	d->box->setPosition(p);
+	//d->box->setPosition(p);
 
 	d->dir = Vector3(0,0,1);
 
@@ -432,18 +432,18 @@ void MapManager::makeDebrisEx(Chunk* c, int type, int i, int j, int k)
 		d->type = type;
 		d->entity = mGame->getGfx()->getSceneManager()->createEntity("Debris" + StringUtils::toString(type)  + ".mesh");
 		d->node->attachObject(d->entity);
-		d->box = mGame->getPhysics()->createCube(Vector3(0.5f,0.5f,0.5f), Vector3(0,0,0));
-		d->box->setKinematic(true);
+		//d->box = mGame->getPhysics()->createCube(Vector3(0.5f,0.5f,0.5f), Vector3(0,0,0));
+		//d->box->setKinematic(true);
 		d->dat = new userdata;
 		d->dat->c = 0;
 		d->dat->type = type;
-		d->box->setUserData(d->dat);
+		//d->box->setUserData(d->dat);
 	}
 
 	mDebris.push_back(d);
 	Vector3 p = c->obj->getNode()->getPosition() + Vector3(i,j,k);
 	d->node->setPosition(p);
-	d->box->setPosition(p);
+	//d->box->setPosition(p);
 
 	d->dir = d->node->getPosition();
 	d->dir.x *= Rand::randFloat(0.2f, 2.f);
